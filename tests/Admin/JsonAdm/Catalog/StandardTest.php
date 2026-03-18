@@ -1,181 +1,168 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  */
 
-
 namespace Aimeos\Admin\JsonAdm\Catalog;
-
 
 class StandardTest extends \PHPUnit\Framework\TestCase
 {
-	private $context;
-	private $object;
-	private $view;
+    private $context;
+    private $object;
+    private $view;
 
+    protected function setUp(): void
+    {
+        \Aimeos\MShop::cache(true);
 
-	protected function setUp() : void
-	{
-		\Aimeos\MShop::cache( true );
+        $this->context = \TestHelper::context();
+        $this->view = $this->context->view();
 
-		$this->context = \TestHelper::context();
-		$this->view = $this->context->view();
+        $this->object = new \Aimeos\Admin\JsonAdm\Catalog\Standard($this->context, 'catalog');
+        $this->object->setAimeos(\TestHelper::getAimeos());
+        $this->object->setView($this->view);
+    }
 
-		$this->object = new \Aimeos\Admin\JsonAdm\Catalog\Standard( $this->context, 'catalog' );
-		$this->object->setAimeos( \TestHelper::getAimeos() );
-		$this->object->setView( $this->view );
-	}
+    protected function tearDown(): void
+    {
+        \Aimeos\MShop::cache(false);
+        unset($this->object, $this->view, $this->context);
+    }
 
+    public function testGetSearch()
+    {
+        $params = [
+            'filter' => [
+                '==' => [ 'catalog.code' => 'cafe' ],
+            ],
+            'include' => 'text',
+        ];
+        $helper = new \Aimeos\Base\View\Helper\Param\Standard($this->view, $params);
+        $this->view->addHelper('param', $helper);
 
-	protected function tearDown() : void
-	{
-		\Aimeos\MShop::cache( false );
-		unset( $this->object, $this->view, $this->context );
-	}
+        $response = $this->object->get($this->view->request(), $this->view->response());
+        $result = json_decode((string) $response->getBody(), true);
 
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(1, count($response->getHeader('Content-Type')));
 
-	public function testGetSearch()
-	{
-		$params = array(
-			'filter' => array(
-				'==' => array( 'catalog.code' => 'cafe' )
-			),
-			'include' => 'text'
-		);
-		$helper = new \Aimeos\Base\View\Helper\Param\Standard( $this->view, $params );
-		$this->view->addHelper( 'param', $helper );
+        $this->assertEquals(1, $result['meta']['total']);
+        $this->assertEquals(1, count($result['data']));
+        $this->assertEquals('catalog', $result['data'][0]['type']);
+        $this->assertEquals(6, count($result['data'][0]['relationships']['text']['data']));
+        $this->assertEquals(6, count($result['included']));
 
-		$response = $this->object->get( $this->view->request(), $this->view->response() );
-		$result = json_decode( (string) $response->getBody(), true );
+        $this->assertArrayNotHasKey('errors', $result);
+    }
 
+    public function testGetTree()
+    {
+        $params = [
+            'id' => $this->getCatalogItem('root')->getId(),
+            'include' => 'catalog,text',
+        ];
+        $helper = new \Aimeos\Base\View\Helper\Param\Standard($this->view, $params);
+        $this->view->addHelper('param', $helper);
 
-		$this->assertEquals( 200, $response->getStatusCode() );
-		$this->assertEquals( 1, count( $response->getHeader( 'Content-Type' ) ) );
+        $response = $this->object->get($this->view->request(), $this->view->response());
+        $result = json_decode((string) $response->getBody(), true);
 
-		$this->assertEquals( 1, $result['meta']['total'] );
-		$this->assertEquals( 1, count( $result['data'] ) );
-		$this->assertEquals( 'catalog', $result['data'][0]['type'] );
-		$this->assertEquals( 6, count( $result['data'][0]['relationships']['text']['data'] ) );
-		$this->assertEquals( 6, count( $result['included'] ) );
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(1, count($response->getHeader('Content-Type')));
 
-		$this->assertArrayNotHasKey( 'errors', $result );
-	}
+        $this->assertEquals(1, $result['meta']['total']);
+        $this->assertEquals('catalog', $result['data']['type']);
+        $this->assertEquals(2, count($result['data']['relationships']['catalog']['data']));
+        $this->assertEquals(2, count($result['included']));
 
+        $this->assertArrayNotHasKey('errors', $result);
+    }
 
-	public function testGetTree()
-	{
-		$params = array(
-			'id' => $this->getCatalogItem( 'root' )->getId(),
-			'include' => 'catalog,text'
-		);
-		$helper = new \Aimeos\Base\View\Helper\Param\Standard( $this->view, $params );
-		$this->view->addHelper( 'param', $helper );
+    public function testPatch()
+    {
+        $stub = $this->getCatalogMock([ 'get', 'move', 'save' ]);
+        $item = $stub->create()->setId('-1');
 
-		$response = $this->object->get( $this->view->request(), $this->view->response() );
-		$result = json_decode( (string) $response->getBody(), true );
+        $stub->expects($this->once())->method('move');
+        $stub->expects($this->once())->method('save')
+            ->willReturn($item);
+        $stub->expects($this->exactly(2))->method('get') // 2x due to decorator
+            ->willReturn($item);
 
-		$this->assertEquals( 200, $response->getStatusCode() );
-		$this->assertEquals( 1, count( $response->getHeader( 'Content-Type' ) ) );
+        $params = [ 'id' => '-1' ];
+        $helper = new \Aimeos\Base\View\Helper\Param\Standard($this->view, $params);
+        $this->view->addHelper('param', $helper);
 
-		$this->assertEquals( 1, $result['meta']['total'] );
-		$this->assertEquals( 'catalog', $result['data']['type'] );
-		$this->assertEquals( 2, count( $result['data']['relationships']['catalog']['data'] ) );
-		$this->assertEquals( 2, count( $result['included'] ) );
+        $body = '{"data": {"parentid": "1", "targetid": 2, "type": "catalog", "attributes": {"catalog.label": "test"}}}';
+        $request = $this->view->request()->withBody($this->view->response()->createStreamFromString($body));
 
-		$this->assertArrayNotHasKey( 'errors', $result );
-	}
+        $response = $this->object->patch($request, $this->view->response());
+        $result = json_decode((string) $response->getBody(), true);
 
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(1, count($response->getHeader('Content-Type')));
 
-	public function testPatch()
-	{
-		$stub = $this->getCatalogMock( array( 'get', 'move', 'save' ) );
-		$item = $stub->create()->setId( '-1' );
+        $this->assertEquals(1, $result['meta']['total']);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertEquals('catalog', $result['data']['type']);
 
-		$stub->expects( $this->once() )->method( 'move' );
-		$stub->expects( $this->once() )->method( 'save' )
-			->willReturn( $item );
-		$stub->expects( $this->exactly( 2 ) )->method( 'get' ) // 2x due to decorator
-			->willReturn( $item );
+        $this->assertArrayNotHasKey('included', $result);
+        $this->assertArrayNotHasKey('errors', $result);
+    }
 
+    public function testPost()
+    {
+        $stub = $this->getCatalogMock([ 'get', 'insert' ]);
+        $item = $stub->create()->setId('-1');
 
-		$params = array( 'id' => '-1' );
-		$helper = new \Aimeos\Base\View\Helper\Param\Standard( $this->view, $params );
-		$this->view->addHelper( 'param', $helper );
+        $stub->expects($this->any())->method('get')
+            ->willReturn($item);
+        $stub->expects($this->once())->method('insert')
+            ->willReturn($item);
 
-		$body = '{"data": {"parentid": "1", "targetid": 2, "type": "catalog", "attributes": {"catalog.label": "test"}}}';
-		$request = $this->view->request()->withBody( $this->view->response()->createStreamFromString( $body ) );
+        $body = '{"data": {"type": "catalog", "attributes": {"catalog.code": "test", "catalog.label": "Test catalog"}}}';
+        $request = $this->view->request()->withBody($this->view->response()->createStreamFromString($body));
 
-		$response = $this->object->patch( $request, $this->view->response() );
-		$result = json_decode( (string) $response->getBody(), true );
+        $response = $this->object->post($request, $this->view->response());
+        $result = json_decode((string) $response->getBody(), true);
 
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals(1, count($response->getHeader('Content-Type')));
 
-		$this->assertEquals( 200, $response->getStatusCode() );
-		$this->assertEquals( 1, count( $response->getHeader( 'Content-Type' ) ) );
+        $this->assertEquals(1, $result['meta']['total']);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertEquals('catalog', $result['data']['type']);
 
-		$this->assertEquals( 1, $result['meta']['total'] );
-		$this->assertArrayHasKey( 'data', $result );
-		$this->assertEquals( 'catalog', $result['data']['type'] );
+        $this->assertArrayNotHasKey('included', $result);
+        $this->assertArrayNotHasKey('errors', $result);
+    }
 
-		$this->assertArrayNotHasKey( 'included', $result );
-		$this->assertArrayNotHasKey( 'errors', $result );
-	}
+    protected function getCatalogItem($code)
+    {
+        $manager = \Aimeos\MShop::create($this->context, 'catalog');
+        $search = $manager->filter();
+        $search->setConditions($search->compare('==', 'catalog.code', $code));
 
+        if (($item = $manager->search($search)->first()) === null) {
+            throw new \RuntimeException(sprintf('No catalog item with code "%1$s" found', $code));
+        }
 
-	public function testPost()
-	{
-		$stub = $this->getCatalogMock( array( 'get', 'insert' ) );
-		$item = $stub->create()->setId( '-1' );
+        return $item;
+    }
 
-		$stub->expects( $this->any() )->method( 'get' )
-			->willReturn( $item );
-		$stub->expects( $this->once() )->method( 'insert' )
-			->willReturn( $item );
+    protected function getCatalogMock(array $methods)
+    {
+        $stub = $this->getMockBuilder('\\Aimeos\\MShop\\Catalog\\Manager\\Standard')
+            ->setConstructorArgs([ $this->context ])
+            ->onlyMethods($methods)
+            ->getMock();
 
+        \Aimeos\MShop::inject('\\Aimeos\\MShop\\Catalog\\Manager\\Standard', $stub);
 
-		$body = '{"data": {"type": "catalog", "attributes": {"catalog.code": "test", "catalog.label": "Test catalog"}}}';
-		$request = $this->view->request()->withBody( $this->view->response()->createStreamFromString( $body ) );
-
-		$response = $this->object->post( $request, $this->view->response() );
-		$result = json_decode( (string) $response->getBody(), true );
-
-
-		$this->assertEquals( 201, $response->getStatusCode() );
-		$this->assertEquals( 1, count( $response->getHeader( 'Content-Type' ) ) );
-
-		$this->assertEquals( 1, $result['meta']['total'] );
-		$this->assertArrayHasKey( 'data', $result );
-		$this->assertEquals( 'catalog', $result['data']['type'] );
-
-		$this->assertArrayNotHasKey( 'included', $result );
-		$this->assertArrayNotHasKey( 'errors', $result );
-	}
-
-
-	protected function getCatalogItem( $code )
-	{
-		$manager = \Aimeos\MShop::create( $this->context, 'catalog' );
-		$search = $manager->filter();
-		$search->setConditions( $search->compare( '==', 'catalog.code', $code ) );
-
-		if( ( $item = $manager->search( $search )->first() ) === null ) {
-			throw new \RuntimeException( sprintf( 'No catalog item with code "%1$s" found', $code ) );
-		}
-
-		return $item;
-	}
-
-
-	protected function getCatalogMock( array $methods )
-	{
-		$stub = $this->getMockBuilder( '\\Aimeos\\MShop\\Catalog\\Manager\\Standard' )
-			->setConstructorArgs( array( $this->context ) )
-			->onlyMethods( $methods )
-			->getMock();
-
-		\Aimeos\MShop::inject( '\\Aimeos\\MShop\\Catalog\\Manager\\Standard', $stub );
-
-		return $stub;
-	}
+        return $stub;
+    }
 }

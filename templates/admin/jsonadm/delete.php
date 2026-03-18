@@ -7,13 +7,12 @@
  * @subpackage Jsonadm
  */
 
-
 ?>
 {
 	"meta": {
-		"total": <?= $this->get( 'total', 0 ); ?>
+		"total": <?= $this->get('total', 0); ?>
 
-		<?php if( $this->csrf()->name() != '' ) : ?>
+		<?php if ($this->csrf()->name() != '') : ?>
 			, "csrf": {
 				"name": "<?= $this->csrf()->name(); ?>",
 				"value": "<?= $this->csrf()->value(); ?>"
@@ -22,8 +21,8 @@
 
 	}
 
-	<?php if( isset( $this->errors ) ) : ?>
-		,"errors": <?= $this->partial( $this->config( 'admin/jsonadm/partials/template-errors', 'partials/errors' ), array( 'errors' => $this->errors ) ); ?>
+	<?php if (isset($this->errors)) : ?>
+		,"errors": <?= $this->partial($this->config('admin/jsonadm/partials/template-errors', 'partials/errors'), [ 'errors' => $this->errors ]); ?>
 
 	<?php endif; ?>
 

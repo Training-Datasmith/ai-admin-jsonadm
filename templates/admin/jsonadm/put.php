@@ -7,11 +7,10 @@
  * @subpackage Jsonadm
  */
 
-
 ?>
 {
-	<?php if( isset( $this->errors ) ) : ?>
-		"errors": <?= $this->partial( $this->config( 'admin/jsonadm/partials/template-errors', 'partials/errors' ), array( 'errors' => $this->errors ) ); ?>
+	<?php if (isset($this->errors)) : ?>
+		"errors": <?= $this->partial($this->config('admin/jsonadm/partials/template-errors', 'partials/errors'), [ 'errors' => $this->errors ]); ?>
 
 	<?php endif; ?>
 

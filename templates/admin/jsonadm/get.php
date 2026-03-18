@@ -7,7 +7,6 @@
  * @subpackage Jsonadm
  */
 
-
 /** admin/jsonadm/url/target
  * Destination of the URL where the client specified in the URL is known
  *
@@ -22,7 +21,7 @@
  * @see admin/jsonadm/url/action
  * @see admin/jsonadm/url/config
  */
-$target = $this->config( 'admin/jsonadm/url/target' );
+$target = $this->config('admin/jsonadm/url/target');
 
 /** admin/jsonadm/url/controller
  * Name of the client whose action should be called
@@ -38,7 +37,7 @@ $target = $this->config( 'admin/jsonadm/url/target' );
  * @see admin/jsonadm/url/action
  * @see admin/jsonadm/url/config
  */
-$cntl = $this->config( 'admin/jsonadm/url/controller', 'jsonadm' );
+$cntl = $this->config('admin/jsonadm/url/controller', 'jsonadm');
 
 /** admin/jsonadm/url/action
  * Name of the action that should create the output
@@ -54,7 +53,7 @@ $cntl = $this->config( 'admin/jsonadm/url/controller', 'jsonadm' );
  * @see admin/jsonadm/url/controller
  * @see admin/jsonadm/url/config
  */
-$action = $this->config( 'admin/jsonadm/url/action', 'get' );
+$action = $this->config('admin/jsonadm/url/action', 'get');
 
 /** admin/jsonadm/url/config
  * Associative list of configuration options used for generating the URL
@@ -76,8 +75,7 @@ $action = $this->config( 'admin/jsonadm/url/action', 'get' );
  * @see admin/jsonadm/url/controller
  * @see admin/jsonadm/url/action
  */
-$config = $this->config( 'admin/jsonadm/url/config', [] );
-
+$config = $this->config('admin/jsonadm/url/config', []);
 
 /** admin/jsonadm/partials/template-errors
  * Relative path to the error partial template file
@@ -127,32 +125,29 @@ $config = $this->config( 'admin/jsonadm/url/config', [] );
  * @category Developer
  */
 
+$total = $this->get('total', 0);
+$offset = max($this->param('page/offset', 0), 0);
+$limit = max($this->param('page/limit', 25), 1);
 
-$total = $this->get( 'total', 0 );
-$offset = max( $this->param( 'page/offset', 0 ), 0 );
-$limit = max( $this->param( 'page/limit', 25 ), 1 );
+$first = ($offset > 0 ? 0 : null);
+$prev = ($offset - $limit >= 0 ? $offset - $limit : null);
+$next = ($offset + $limit < $total ? $offset + $limit : null);
+$last = (((int) ($total / $limit)) * $limit > $offset ? ((int) ($total / $limit)) * $limit : null);
 
-$first = ( $offset > 0 ? 0 : null );
-$prev = ( $offset - $limit >= 0 ? $offset - $limit : null );
-$next = ( $offset + $limit < $total ? $offset + $limit : null );
-$last = ( ( (int) ( $total / $limit ) ) * $limit > $offset ? ( (int) ( $total / $limit ) ) * $limit : null );
+$ref = [ 'id', 'resource', 'filter', 'page', 'sort', 'include', 'fields' ];
+$params = array_intersect_key($this->param(), array_flip($ref)) + ['id' => ''];
+$fields = $this->param('fields', []);
 
-
-$ref = array( 'id', 'resource', 'filter', 'page', 'sort', 'include', 'fields' );
-$params = array_intersect_key( $this->param(), array_flip( $ref ) ) + ['id' => ''];
-$fields = $this->param( 'fields', [] );
-
-foreach( (array) $fields as $resource => $list ) {
-	$fields[$resource] = array_flip( explode( ',', $list ) );
+foreach ((array) $fields as $resource => $list) {
+    $fields[$resource] = array_flip(explode(',', $list));
 }
-
 
 ?>
 {
 	"meta": {
 		"total": <?= $total; ?>
 
-		<?php if( $this->csrf()->name() != '' ) : ?>
+		<?php if ($this->csrf()->name() != '') : ?>
 			, "csrf": {
 				"name": "<?= $this->csrf()->name(); ?>",
 				"value": "<?= $this->csrf()->value(); ?>"
@@ -163,35 +158,40 @@ foreach( (array) $fields as $resource => $list ) {
 
 	"links": {
 
-		<?php if( is_map( $this->get( 'data' ) ) ) : ?>
-			<?php if( $first !== null ) : ?>
-				"first": "<?php $params['page']['offset'] = $first; echo $this->url( $target, $cntl, $action, $params, [], $config ); ?>",
+		<?php if (is_map($this->get('data'))) : ?>
+			<?php if ($first !== null) : ?>
+				"first": "<?php $params['page']['offset'] = $first;
+			    echo $this->url($target, $cntl, $action, $params, [], $config); ?>",
 
 			<?php endif; ?>
-			<?php if( $prev !== null ) : ?>
-				"prev": "<?php $params['page']['offset'] = $prev; echo $this->url( $target, $cntl, $action, $params, [], $config ); ?>",
+			<?php if ($prev !== null) : ?>
+				"prev": "<?php $params['page']['offset'] = $prev;
+			    echo $this->url($target, $cntl, $action, $params, [], $config); ?>",
 
 			<?php endif; ?>
-			<?php if( $next !== null ) : ?>
-				"next": "<?php $params['page']['offset'] = $next; echo $this->url( $target, $cntl, $action, $params, [], $config ); ?>",
+			<?php if ($next !== null) : ?>
+				"next": "<?php $params['page']['offset'] = $next;
+			    echo $this->url($target, $cntl, $action, $params, [], $config); ?>",
 
 			<?php endif; ?>
-			<?php if( $last !== null ) : ?>
-				"last": "<?php $params['page']['offset'] = $last; echo $this->url( $target, $cntl, $action, $params, [], $config ); ?>",
+			<?php if ($last !== null) : ?>
+				"last": "<?php $params['page']['offset'] = $last;
+			    echo $this->url($target, $cntl, $action, $params, [], $config); ?>",
 
 			<?php endif; ?>
 		<?php endif; ?>
 
-		"self": "<?php $params['page']['offset'] = $offset; echo $this->url( $target, $cntl, $action, $params, [], $config ); ?>"
+		"self": "<?php $params['page']['offset'] = $offset;
+echo $this->url($target, $cntl, $action, $params, [], $config); ?>"
 	},
 
-	<?php if( isset( $this->errors ) ) : ?>
-		"errors": <?= $this->partial( $this->config( $this->get( 'partial-errors', 'admin/jsonadm/partials/template-errors' ), 'partials/errors' ), array( 'errors' => $this->errors ) ); ?>
+	<?php if (isset($this->errors)) : ?>
+		"errors": <?= $this->partial($this->config($this->get('partial-errors', 'admin/jsonadm/partials/template-errors'), 'partials/errors'), [ 'errors' => $this->errors ]); ?>
 
-	<?php elseif( isset( $this->data ) ) : ?>
-		"data": <?= $this->partial( $this->config( $this->get( 'partial-data', 'admin/jsonadm/partials/template-data' ), 'partials/data' ), array( 'data' => $this->get( 'data' ), 'childItems' => $this->get( 'childItems', [] ), 'listItems' => $this->get( 'listItems', [] ) ) ); ?>,
+	<?php elseif (isset($this->data)) : ?>
+		"data": <?= $this->partial($this->config($this->get('partial-data', 'admin/jsonadm/partials/template-data'), 'partials/data'), [ 'data' => $this->get('data'), 'childItems' => $this->get('childItems', []), 'listItems' => $this->get('listItems', []) ]); ?>,
 
-		"included": <?= $this->partial( $this->config( $this->get( 'partial-included', 'admin/jsonadm/partials/template-included' ), 'partials/included' ), array( 'childItems' => $this->get( 'childItems', [] ), 'refItems' => $this->get( 'refItems', [] ) ) ); ?>
+		"included": <?= $this->partial($this->config($this->get('partial-included', 'admin/jsonadm/partials/template-included'), 'partials/included'), [ 'childItems' => $this->get('childItems', []), 'refItems' => $this->get('refItems', []) ]); ?>
 
 	<?php endif; ?>
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2016-2026
@@ -7,11 +9,9 @@
  * @subpackage Jsonadm
  */
 
-
 $options = 0;
-if( defined( 'JSON_PRETTY_PRINT' ) ) {
-	$options = JSON_PRETTY_PRINT;
+if (defined('JSON_PRETTY_PRINT')) {
+    $options = JSON_PRETTY_PRINT;
 }
 
-
-echo json_encode( $this->get( 'errors', [] ), $options );
+echo json_encode($this->get('errors', []), $options);

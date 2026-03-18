@@ -7,20 +7,19 @@
  * @subpackage Jsonadm
  */
 
-
-$data = $this->get( 'data', [] );
+$data = $this->get('data', []);
 $entries = [];
 
-foreach( $data as $key => $value ) {
-	$entries[] = array( 'id' => $key, 'type' => 'aggregate', 'attributes' => $value );
+foreach ($data as $key => $value) {
+    $entries[] = [ 'id' => $key, 'type' => 'aggregate', 'attributes' => $value ];
 }
 
 ?>
 {
 	"meta": {
-		"total": <?= count( $data ); ?>
+		"total": <?= count($data); ?>
 
-		<?php if( $this->csrf()->name() != '' ) : ?>
+		<?php if ($this->csrf()->name() != '') : ?>
 			, "csrf": {
 				"name": "<?= $this->csrf()->name(); ?>",
 				"value": "<?= $this->csrf()->value(); ?>"
@@ -29,11 +28,11 @@ foreach( $data as $key => $value ) {
 
 	},
 
-	<?php if( isset( $this->errors ) ) : ?>
-		"errors": <?= $this->partial( $this->config( $this->get( 'partial-errors', 'admin/jsonadm/partials/template-errors' ), 'partials/errors' ), array( 'errors' => $this->errors ) ); ?>
+	<?php if (isset($this->errors)) : ?>
+		"errors": <?= $this->partial($this->config($this->get('partial-errors', 'admin/jsonadm/partials/template-errors'), 'partials/errors'), [ 'errors' => $this->errors ]); ?>
 
-	<?php elseif( isset( $this->data ) ) : ?>
-		"data": <?= json_encode( $entries ); ?>
+	<?php elseif (isset($this->data)) : ?>
+		"data": <?= json_encode($entries); ?>
 
 	<?php endif; ?>
 }
