@@ -122,18 +122,18 @@ class Standard
 		catch( \Aimeos\MShop\Exception $e )
 		{
 			$status = 404;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $this->context()->translate( 'mshop', $e->getMessage() ),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 		catch( \Exception $e )
 		{
 			$status = 500;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $e->getMessage(),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 
 		/** admin/jsonadm/coupon/config/template-get

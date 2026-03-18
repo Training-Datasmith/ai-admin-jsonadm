@@ -111,7 +111,7 @@ class Standard
 	{
 		$list = map();
 		$ids = $items->keys()->toArray();
-		$include = array_intersect( $include, array( 'customer/address' ) );
+		$include = array_intersect( $include, [ 'customer/address' ] );
 
 		foreach( $include as $type )
 		{

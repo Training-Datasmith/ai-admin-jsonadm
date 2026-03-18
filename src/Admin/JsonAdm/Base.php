@@ -26,7 +26,6 @@ abstract class Base
 	private \Aimeos\MShop\ContextIface $context;
 	private ?\Aimeos\Base\View\Iface $view = null;
 	private ?\Aimeos\Bootstrap $aimeos = null;
-	private string $path;
 
 
 	/**
@@ -35,10 +34,9 @@ abstract class Base
 	 * @param \Aimeos\MShop\ContextIface $context MShop context object
 	 * @param string $path Name of the client separated by slashes, e.g "product/property"
 	 */
-	public function __construct( \Aimeos\MShop\ContextIface $context, string $path )
+	public function __construct( \Aimeos\MShop\ContextIface $context, private string $path )
 	{
 		$this->context = $context;
-		$this->path = $path;
 	}
 
 
@@ -165,9 +163,7 @@ abstract class Base
 	 */
 	protected function getListItems( \Aimeos\Map $items, array $include ) : \Aimeos\Map
 	{
-		return $items->filter( function( $item ) {
-			return $item instanceof \Aimeos\MShop\Common\Item\Lists\Iface;
-		} );
+		return $items->filter( fn($item) => $item instanceof \Aimeos\MShop\Common\Item\Lists\Iface );
 	}
 
 

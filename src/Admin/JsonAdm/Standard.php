@@ -43,26 +43,26 @@ class Standard
 		catch( \Aimeos\Admin\JsonAdm\Exception $e )
 		{
 			$status = $e->getCode();
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $this->context()->translate( 'admin/jsonadm', $e->getMessage() ),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 		catch( \Aimeos\MShop\Exception $e )
 		{
 			$status = 404;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $this->context()->translate( 'mshop', $e->getMessage() ),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 		catch( \Exception $e )
 		{
 			$status = 500;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $e->getMessage(),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 
 		/** admin/jsonadm/template-delete
@@ -120,18 +120,18 @@ class Standard
 		catch( \Aimeos\MShop\Exception $e )
 		{
 			$status = 404;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $this->context()->translate( 'mshop', $e->getMessage() ),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 		catch( \Exception $e )
 		{
 			$status = 500;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $e->getMessage(),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 
 		if( $view->param( 'aggregate' ) !== null )
@@ -222,26 +222,26 @@ class Standard
 		catch( \Aimeos\Admin\JsonAdm\Exception $e )
 		{
 			$status = $e->getCode();
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $this->context()->translate( 'admin/jsonadm', $e->getMessage() ),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 		catch( \Aimeos\MShop\Exception $e )
 		{
 			$status = 404;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $this->context()->translate( 'mshop', $e->getMessage() ),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 		catch( \Exception $e )
 		{
 			$status = 500;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $e->getMessage(),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 
 		/** admin/jsonadm/template-patch
@@ -299,26 +299,26 @@ class Standard
 		catch( \Aimeos\Admin\JsonAdm\Exception $e )
 		{
 			$status = $e->getCode();
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $this->context()->translate( 'admin/jsonadm', $e->getMessage() ),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 		catch( \Aimeos\MShop\Exception $e )
 		{
 			$status = 404;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $this->context()->translate( 'mshop', $e->getMessage() ),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 		catch( \Exception $e )
 		{
 			$status = 500;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $e->getMessage(),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 
 		/** admin/jsonadm/template-post
@@ -369,9 +369,9 @@ class Standard
 		$status = 501;
 		$view = $this->view();
 
-		$view->errors = array( array(
+		$view->errors = [ [
 			'title' => $this->context()->translate( 'admin/jsonadm', 'Not implemented, use PATCH instead' ),
-		) );
+		] ];
 
 		/** admin/jsonadm/template-put
 		 * Relative path to the JSON API template for PUT requests
@@ -444,18 +444,18 @@ class Standard
 		catch( \Aimeos\MShop\Exception $e )
 		{
 			$status = 404;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $context->translate( 'mshop', $e->getMessage() ),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 		catch( \Exception $e )
 		{
 			$status = 500;
-			$view->errors = array( array(
+			$view->errors = [ [
 				'title' => $e->getMessage(),
 				'detail' => $e->getTraceAsString(),
-			) );
+			] ];
 		}
 
 		/** admin/jsonadm/template-options

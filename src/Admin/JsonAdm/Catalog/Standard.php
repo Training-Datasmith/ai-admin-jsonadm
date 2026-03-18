@@ -127,7 +127,7 @@ class Standard
 		 * @since 2016.07
 		 * @category Developer
 		 */
-		$this->view()->assign( array( 'partial-data' => 'admin/jsonadm/partials/catalog/template-data' ) );
+		$this->view()->assign( [ 'partial-data' => 'admin/jsonadm/partials/catalog/template-data' ] );
 
 		return parent::get( $request, $response );
 	}
@@ -224,8 +224,8 @@ class Standard
 	 */
 	protected function saveEntry( \Aimeos\MShop\Common\Manager\Iface $manager, \stdClass $entry ) : \Aimeos\MShop\Common\Item\Iface
 	{
-		$targetId = ( isset( $entry->targetid ) ? $entry->targetid : null );
-		$refId = ( isset( $entry->refid ) ? $entry->refid : null );
+		$targetId = ( $entry->targetid ?? null );
+		$refId = ( $entry->refid ?? null );
 
 		if( isset( $entry->id ) )
 		{

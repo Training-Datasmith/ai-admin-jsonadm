@@ -111,7 +111,7 @@ class Standard
 	{
 		$list = map();
 		$ids = $items->keys()->toArray();
-		$include = array_intersect( $include, array( 'coupon/code' ) );
+		$include = array_intersect( $include, [ 'coupon/code' ] );
 
 		foreach( $include as $type )
 		{

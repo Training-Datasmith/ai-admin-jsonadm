@@ -19,7 +19,7 @@ namespace Aimeos\Admin\JsonAdm\Common\Factory;
  */
 class Base
 {
-	private static $objects = [];
+	private static array $objects = [];
 
 
 	/**
@@ -31,7 +31,7 @@ class Base
 	 * @param string $classname Full name of the class for which the object should be returned
 	 * @param \Aimeos\Admin\JsonAdm\Iface|null $client JSON API client object
 	 */
-	public static function injectClient( string $classname, ?\Aimeos\Admin\JsonAdm\Iface $client = null )
+	public static function injectClient( string $classname, ?\Aimeos\Admin\JsonAdm\Iface $client = null ): void
 	{
 		self::$objects[$classname] = $client;
 	}
@@ -147,10 +147,6 @@ class Base
 	protected static function createAdmin( string $classname, string $interface,
 		\Aimeos\MShop\ContextIface $context, string $path ) : \Aimeos\Admin\JsonAdm\Common\Iface
 	{
-		if( isset( self::$objects[$classname] ) ) {
-			return self::$objects[$classname];
-		}
-
-		return \Aimeos\Utils::create( $classname, [$context, $path], $interface );
+		return self::$objects[$classname] ?? \Aimeos\Utils::create( $classname, [$context, $path], $interface );
 	}
 }
