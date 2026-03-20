@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
-
-namespace Aimeos\Admin\JsonAdm\Common\Factory;
+namespace Aimeos\Admin\Json_Adm\Common\Factory;
 
 /**
  * JSON API client factory interface
@@ -28,10 +26,5 @@ interface Iface
      * @param string|null $name Name of the client implementation ("Standard" if null)
      * @return \Aimeos\Admin\JsonAdm\Iface Client Interface
      */
-    public static function create(
-        \Aimeos\MShop\ContextIface $context,
-        \Aimeos\Bootstrap $aimeos,
-        string $path,
-        ?string $name = null
-    ): \Aimeos\Admin\JsonAdm\Iface;
+    public static function create(\Aimeos\M_Shop\Context_Iface $context, \Aimeos\Bootstrap $aimeos, string $path, ?string $name = null): \Aimeos\Admin\Json_Adm\Iface;
 }

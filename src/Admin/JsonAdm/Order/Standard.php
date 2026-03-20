@@ -1,26 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
+namespace Aimeos\Admin\Json_Adm\Order;
 
-namespace Aimeos\Admin\JsonAdm\Order;
-
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
+use Psr\Http\Message\Response_Interface;
+use Psr\Http\Message\Server_Request_Interface;
 /**
  * JSON API order client
  *
  * @package Admin
  * @subpackage JsonAdm
  */
-class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\JsonAdm\Common\Iface
+class Standard extends \Aimeos\Admin\Json_Adm\Standard implements \Aimeos\Admin\Json_Adm\Common\Iface
 {
     /** admin/jsonadm/order/decorators/excludes
      * Excludes decorators added by the "common" option from the JSON API clients
@@ -47,7 +44,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/order/decorators/global
      * @see admin/jsonadm/order/decorators/local
      */
-
     /** admin/jsonadm/order/decorators/global
      * Adds a list of globally available decorators only to the Jsonadm client
      *
@@ -73,7 +69,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/order/decorators/excludes
      * @see admin/jsonadm/order/decorators/local
      */
-
     /** admin/jsonadm/order/decorators/local
      * Adds a list of local decorators only to the Jsonadm client
      *
@@ -99,7 +94,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/order/decorators/excludes
      * @see admin/jsonadm/order/decorators/global
      */
-
     /**
      * Returns the requested resource or the resource list
      *
@@ -107,7 +101,7 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function get(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function get(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         /** admin/jsonadm/partials/order/template-data
          * Relative path to the data partial template file for the order client
@@ -124,14 +118,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
          * @since 2016.01
          * @category Developer
          */
-        $this->view()->assign([
-            'partial-data' => 'admin/jsonadm/partials/order/template-data',
-            'partial-included' => 'admin/jsonadm/partials/order/template-included',
-        ]);
-
+        $this->view()->assign(['partial-data' => 'admin/jsonadm/partials/order/template-data', 'partial-included' => 'admin/jsonadm/partials/order/template-included']);
         return parent::get($request, $response);
     }
-
     /**
      * Retrieves the item or items and adds the data to the view
      *
@@ -140,36 +129,30 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    protected function getItems(\Aimeos\Base\View\Iface $view, ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    protected function get_items(\Aimeos\Base\View\Iface $view, Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         $context = $this->context();
-        $manager = \Aimeos\MShop::create($context, $this->getPath());
+        $manager = \Aimeos\M_Shop::create($context, $this->get_path());
         $search = $manager->filter(false, true);
-
         if (($key = $view->param('aggregate')) !== null) {
-            $search = $this->initCriteria($search, $view->param());
+            $search = $this->init_criteria($search, $view->param());
             $view->data = $manager->aggregate($search, explode(',', $key), $view->param('value'), $view->param('type'));
             return $response;
         }
-
         $total = 1;
-        $include = (($include = $view->param('include')) !== null ? explode(',', $include) : []);
-
+        $include = ($include = $view->param('include')) !== null ? explode(',', $include) : [];
         if (($id = $view->param('id')) == null) {
-            $search = $this->initCriteria($search, $view->param());
+            $search = $this->init_criteria($search, $view->param());
         } else {
-            $search->setConditions($search->compare('==', 'order.id', $id));
+            $search->set_conditions($search->compare('==', 'order.id', $id));
         }
-
         $view->data = $manager->search($search, [], $total);
-        $view->childItems = $this->getChildItems($view->data, $include);
-        $view->listItems = $this->getListItems($view->data, $include);
-        $view->refItems = $this->getRefItems($view->listItems);
+        $view->child_items = $this->get_child_items($view->data, $include);
+        $view->list_items = $this->get_list_items($view->data, $include);
+        $view->ref_items = $this->get_ref_items($view->list_items);
         $view->total = $total;
-
         return $response;
     }
-
     /**
      * Returns the items with parent/child relationships
      *
@@ -177,43 +160,28 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param array $include List of resource types that should be fetched
      * @return \Aimeos\Map List of items implementing \Aimeos\MShop\Common\Item\Iface
      */
-    protected function getChildItems(\Aimeos\Map $items, array $include): \Aimeos\Map
+    protected function get_child_items(\Aimeos\Map $items, array $include): \Aimeos\Map
     {
         $list = map();
-
-        $ids = map($items)->getId()->toArray();
-        $manager = \Aimeos\MShop::create($this->context(), 'order');
-
+        $ids = map($items)->get_id()->to_array();
+        $manager = \Aimeos\M_Shop::create($this->context(), 'order');
         $search = $manager->filter(false, true);
-        $search->setConditions($search->and([
-            $search->compare('==', 'order.id', $ids),
-            $search->getConditions(),
-        ]));
-
+        $search->set_conditions($search->and([$search->compare('==', 'order.id', $ids), $search->get_conditions()]));
         $orders = $manager->search($search, $include);
-
-        $list = $list->merge($orders)
-            ->merge($orders->getAddresses()->flat())->merge($orders->getCoupons()->flat())
-            ->merge($orders->getProducts()->flat())->merge($orders->getServices()->flat());
-
-        foreach ($orders->getProducts()->flat() as $row) {
-            $list->merge($row->getAttributeItems());
+        $list = $list->merge($orders)->merge($orders->get_addresses()->flat())->merge($orders->get_coupons()->flat())->merge($orders->get_products()->flat())->merge($orders->get_services()->flat());
+        foreach ($orders->get_products()->flat() as $row) {
+            $list->merge($row->get_attribute_items());
         }
-
-        foreach ($orders->getServices()->flat() as $row) {
-            $list->merge($row->getAttributeItems());
+        foreach ($orders->get_services()->flat() as $row) {
+            $list->merge($row->get_attribute_items());
         }
-
         if (in_array('order/status', $include)) {
-            $ids = $items->keys()->toArray();
-            $manager = \Aimeos\MShop::create($this->context(), 'order/status');
-
+            $ids = $items->keys()->to_array();
+            $manager = \Aimeos\M_Shop::create($this->context(), 'order/status');
             $search = $manager->filter();
-            $search->setConditions($search->compare('==', 'order.status.parentid', $ids));
-
+            $search->set_conditions($search->compare('==', 'order.status.parentid', $ids));
             $list = $list->merge($manager->search($search));
         }
-
         return $list;
     }
 }

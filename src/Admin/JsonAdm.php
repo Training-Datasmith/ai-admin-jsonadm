@@ -1,14 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
-
 namespace Aimeos\Admin;
 
 /**
@@ -17,7 +15,7 @@ namespace Aimeos\Admin;
  * @package Admin
  * @subpackage JsonAdm
  */
-class JsonAdm
+class Json_Adm
 {
     /** admin/jsonadm/name
      * Class name of the used JSON API client implementation
@@ -52,7 +50,6 @@ class JsonAdm
      * @since 2015.12
      * @category Developer
      */
-
     /** admin/jsonadm/decorators/excludes
      * Excludes decorators added by the "common" option from the JSON API clients
      *
@@ -78,7 +75,6 @@ class JsonAdm
      * @see admin/jsonadm/decorators/global
      * @see admin/jsonadm/decorators/local
      */
-
     /** admin/jsonadm/decorators/global
      * Adds a list of globally available decorators only to the Jsonadm client
      *
@@ -104,7 +100,6 @@ class JsonAdm
      * @see admin/jsonadm/decorators/excludes
      * @see admin/jsonadm/decorators/local
      */
-
     /** admin/jsonadm/decorators/local
      * Adds a list of local decorators only to the Jsonadm client
      *
@@ -130,9 +125,7 @@ class JsonAdm
      * @see admin/jsonadm/decorators/excludes
      * @see admin/jsonadm/decorators/global
      */
-
     private static array $objects = [];
-
     /**
      * Creates the required client specified by the given path of client names.
      *
@@ -148,44 +141,30 @@ class JsonAdm
      * @return \Aimeos\Admin\JsonAdm\Iface JSON admin instance
      * @throws \Aimeos\Admin\JsonAdm\Exception If the given path is invalid
      */
-    public static function create(
-        \Aimeos\MShop\ContextIface $context,
-        \Aimeos\Bootstrap $aimeos,
-        string $path,
-        ?string $name = null
-    ): \Aimeos\Admin\JsonAdm\Iface {
+    public static function create(\Aimeos\M_Shop\Context_Iface $context, \Aimeos\Bootstrap $aimeos, string $path, ?string $name = null): \Aimeos\Admin\Json_Adm\Iface
+    {
         if (preg_match('/^[a-z0-9\/]*$/', $path) !== 1) {
-            throw new \Aimeos\Admin\JsonAdm\Exception(sprintf('Invalid component path "%1$s"', $path, 400));
+            throw new \Aimeos\Admin\Json_Adm\Exception(sprintf('Invalid component path "%1$s"', $path, 400));
         }
-
         empty($path = trim($path, '/')) ?: $path .= '/';
-
         $view = $context->view();
         $config = $context->config();
-
         if ($view->access($config->get('admin/jsonadm/resource/' . $path . 'groups', [])) !== true) {
-            throw new \Aimeos\Admin\JQAdm\Exception(sprintf('Not allowed to access JsonAdm "%1$s" client', $path), 403);
+            throw new \Aimeos\Admin\Jq_Adm\Exception(sprintf('Not allowed to access JsonAdm "%1$s" client', $path), 403);
         }
-
         $cname = $name ?: $context->config()->get('admin/jsonadm/' . $path . 'name', 'Standard');
-
-        $classname = '\\Aimeos\\Admin\\JsonAdm\\' . str_replace('/', '\\', ucwords($path, '/')) . $cname;
-        $interface = \Aimeos\Admin\JsonAdm\Iface::class;
-
+        $classname = '\Aimeos\Admin\JsonAdm\\' . str_replace('/', '\\', ucwords($path, '/')) . $cname;
+        $interface = \Aimeos\Admin\Json_Adm\Iface::class;
         if (class_exists($classname) === false) {
             $cname = $name ?: $context->config()->get('admin/jsonadm/name', 'Standard');
-            $classname = '\\Aimeos\\Admin\\JsonAdm\\' . $cname;
-
+            $classname = '\Aimeos\Admin\JsonAdm\\' . $cname;
             if (class_exists($classname) === false) {
-                throw new \Aimeos\Admin\JsonAdm\Exception(sprintf('Class "%1$s" not found', $classname, 404));
+                throw new \Aimeos\Admin\Json_Adm\Exception(sprintf('Class "%1$s" not found', $classname, 404));
             }
         }
-
-        $client = self::createComponent($context, $classname, $interface, $path);
-
-        return $client->setAimeos($aimeos)->setView($view);
+        $client = self::create_component($context, $classname, $interface, $path);
+        return $client->set_aimeos($aimeos)->set_view($view);
     }
-
     /**
      * Injects a client object
      *
@@ -195,11 +174,10 @@ class JsonAdm
      * @param string $classname Full name of the class for which the object should be returned
      * @param \Aimeos\Admin\JsonAdm\Iface|null $client JSON API client object
      */
-    public static function inject(string $classname, ?\Aimeos\Admin\JsonAdm\Iface $client = null): void
+    public static function inject(string $classname, ?\Aimeos\Admin\Json_Adm\Iface $client = null): void
     {
         self::$objects['\\' . ltrim($classname, '\\')] = $client;
     }
-
     /**
      * Adds the decorators to the JSON API client object
      *
@@ -208,22 +186,16 @@ class JsonAdm
      * @param string $path Name of the client separated by slashes, e.g "product/property"
      * @return \Aimeos\Admin\JsonAdm\Iface Client object
      */
-    protected static function addComponentDecorators(
-        \Aimeos\MShop\ContextIface $context,
-        \Aimeos\Admin\JsonAdm\Iface $client,
-        string $path
-    ): \Aimeos\Admin\JsonAdm\Iface {
+    protected static function add_component_decorators(\Aimeos\M_Shop\Context_Iface $context, \Aimeos\Admin\Json_Adm\Iface $client, string $path): \Aimeos\Admin\Json_Adm\Iface
+    {
         $config = $context->config();
-        $localClass = str_replace('/', '\\', ucwords($path, '/'));
-
-        $classprefix = '\\Aimeos\\Admin\\JsonAdm\\' . ucfirst($localClass) . 'Decorator\\';
+        $local_class = str_replace('/', '\\', ucwords($path, '/'));
+        $classprefix = '\Aimeos\Admin\JsonAdm\\' . ucfirst($local_class) . 'Decorator\\';
         $decorators = array_reverse($config->get('admin/jsonadm/' . $path . 'decorators/local', []));
-        $client = self::addDecorators($context, $client, $path, $decorators, $classprefix);
-
-        $classprefix = '\\Aimeos\\Admin\\JsonAdm\\Common\\Decorator\\';
+        $client = self::add_decorators($context, $client, $path, $decorators, $classprefix);
+        $classprefix = '\Aimeos\Admin\JsonAdm\Common\Decorator\\';
         $decorators = array_reverse($config->get('admin/jsonadm/' . $path . 'decorators/global', []));
-        $client = self::addDecorators($context, $client, $path, $decorators, $classprefix);
-
+        $client = self::add_decorators($context, $client, $path, $decorators, $classprefix);
         /** admin/jsonadm/common/decorators/default
          * Configures the list of decorators applied to all JSON API clients
          *
@@ -248,18 +220,14 @@ class JsonAdm
          */
         $decorators = array_reverse($config->get('admin/jsonadm/common/decorators/default', []));
         $excludes = $config->get('admin/jsonadm/' . $path . 'decorators/excludes', []);
-
         foreach ($decorators as $key => $name) {
             if (in_array($name, $excludes)) {
                 unset($decorators[$key]);
             }
         }
-
-        $classprefix = '\\Aimeos\\Admin\\JsonAdm\\Common\\Decorator\\';
-
-        return self::addDecorators($context, $client, $path, $decorators, $classprefix);
+        $classprefix = '\Aimeos\Admin\JsonAdm\Common\Decorator\\';
+        return self::add_decorators($context, $client, $path, $decorators, $classprefix);
     }
-
     /**
      * Adds the decorators to the client object
      *
@@ -271,26 +239,17 @@ class JsonAdm
      * @return \Aimeos\Admin\JsonAdm\Iface Client object
      * @throws \LogicException If class can't be instantiated
      */
-    protected static function addDecorators(
-        \Aimeos\MShop\ContextIface $context,
-        \Aimeos\Admin\JsonAdm\Iface $client,
-        string $path,
-        array $decorators,
-        string $classprefix
-    ): \Aimeos\Admin\JsonAdm\Iface {
-        $interface = \Aimeos\Admin\JsonAdm\Common\Decorator\Iface::class;
-
+    protected static function add_decorators(\Aimeos\M_Shop\Context_Iface $context, \Aimeos\Admin\Json_Adm\Iface $client, string $path, array $decorators, string $classprefix): \Aimeos\Admin\Json_Adm\Iface
+    {
+        $interface = \Aimeos\Admin\Json_Adm\Common\Decorator\Iface::class;
         foreach ($decorators as $name) {
             if (ctype_alnum($name) === false) {
                 throw new \LogicException(sprintf('Invalid class name "%1$s"', $name), 400);
             }
-
             $client = \Aimeos\Utils::create($classprefix . $name, [$client, $context, $path], $interface);
         }
-
         return $client;
     }
-
     /**
      * Creates a new client object
      *
@@ -300,18 +259,12 @@ class JsonAdm
      * @param string $path Name of the client separated by slashes, e.g "product/property"
      * @return \Aimeos\Admin\JsonAdm\Iface Client object
      */
-    protected static function createComponent(
-        \Aimeos\MShop\ContextIface $context,
-        string $classname,
-        string $interface,
-        string $path
-    ): \Aimeos\Admin\JsonAdm\Iface {
+    protected static function create_component(\Aimeos\M_Shop\Context_Iface $context, string $classname, string $interface, string $path): \Aimeos\Admin\Json_Adm\Iface
+    {
         if (isset(self::$objects[$classname])) {
             return self::$objects[$classname];
         }
-
         $client = \Aimeos\Utils::create($classname, [$context, trim($path, '/')], $interface);
-
-        return self::addComponentDecorators($context, $client, $path);
+        return self::add_component_decorators($context, $client, $path);
     }
 }

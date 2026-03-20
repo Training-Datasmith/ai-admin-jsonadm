@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2021-2026
  * @package Admin
  * @subpackage JsonAdm
  */
-
-namespace Aimeos\Admin\JsonAdm\Rule;
+namespace Aimeos\Admin\Json_Adm\Rule;
 
 /**
  * JSON API rule client
@@ -17,7 +15,7 @@ namespace Aimeos\Admin\JsonAdm\Rule;
  * @package Admin
  * @subpackage JsonAdm
  */
-class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\JsonAdm\Common\Iface
+class Standard extends \Aimeos\Admin\Json_Adm\Standard implements \Aimeos\Admin\Json_Adm\Common\Iface
 {
     /** admin/jsonadm/rule/decorators/excludes
      * Excludes decorators added by the "common" option from the JSON API clients
@@ -44,7 +42,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/rule/decorators/global
      * @see admin/jsonadm/rule/decorators/local
      */
-
     /** admin/jsonadm/rule/decorators/global
      * Adds a list of globally available decorators only to the Jsonadm client
      *
@@ -70,7 +67,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/rule/decorators/excludes
      * @see admin/jsonadm/rule/decorators/local
      */
-
     /** admin/jsonadm/rule/decorators/local
      * Adds a list of local decorators only to the Jsonadm client
      *

@@ -1,26 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
+namespace Aimeos\Admin\Json_Adm\Common\Decorator;
 
-namespace Aimeos\Admin\JsonAdm\Common\Decorator;
-
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
+use Psr\Http\Message\Response_Interface;
+use Psr\Http\Message\Server_Request_Interface;
 /**
  * Provides common methods for JSON API client decorators
  *
  * @package Admin
  * @subpackage JsonAdm
  */
-abstract class Base extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonAdm\Common\Decorator\Iface
+abstract class Base extends \Aimeos\Admin\Json_Adm\Base implements \Aimeos\Admin\Json_Adm\Common\Decorator\Iface
 {
     /**
      * Initializes the client decorator.
@@ -29,11 +26,10 @@ abstract class Base extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\
      * @param \Aimeos\MShop\ContextIface $context Context object with required objects
      * @param string $path Name of the client separated by slashes, e.g "product/property"
      */
-    public function __construct(private \Aimeos\Admin\JsonAdm\Iface $client, \Aimeos\MShop\ContextIface $context, string $path)
+    public function __construct(private \Aimeos\Admin\Json_Adm\Iface $client, \Aimeos\M_Shop\Context_Iface $context, string $path)
     {
         parent::__construct($context, $path);
     }
-
     /**
      * Passes unknown methods to wrapped objects
      *
@@ -44,9 +40,8 @@ abstract class Base extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\
      */
     public function __call(string $name, array $param)
     {
-        return @call_user_func_array([ $this->client, $name ], $param);
+        return @call_user_func_array([$this->client, $name], $param);
     }
-
     /**
      * Deletes the resource or the resource list
      *
@@ -54,11 +49,10 @@ abstract class Base extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function delete(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function delete(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         return $this->client->delete($request, $response);
     }
-
     /**
      * Returns the requested resource or the resource list
      *
@@ -66,11 +60,10 @@ abstract class Base extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function get(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function get(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         return $this->client->get($request, $response);
     }
-
     /**
      * Updates the resource or the resource list partitially
      *
@@ -78,11 +71,10 @@ abstract class Base extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function patch(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function patch(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         return $this->client->patch($request, $response);
     }
-
     /**
      * Creates or updates the resource or the resource list
      *
@@ -90,11 +82,10 @@ abstract class Base extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function post(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function post(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         return $this->client->post($request, $response);
     }
-
     /**
      * Creates or updates the resource or the resource list
      *
@@ -102,11 +93,10 @@ abstract class Base extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function put(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function put(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         return $this->client->put($request, $response);
     }
-
     /**
      * Returns the available REST verbs
      *
@@ -115,58 +105,49 @@ abstract class Base extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\
      * @param string|null $prefix Form parameter prefix when nesting parameters is required
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function options(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        ?string $prefix = null
-    ): \Psr\Http\Message\ResponseInterface {
+    public function options(Server_Request_Interface $request, Response_Interface $response, ?string $prefix = null): \Psr\Http\Message\Response_Interface
+    {
         return $this->client->options($request, $response, $prefix);
     }
-
     /**
      * Returns the Aimeos bootstrap object
      *
      * @return \Aimeos\Bootstrap The Aimeos bootstrap object
      */
-    public function getAimeos(): \Aimeos\Bootstrap
+    public function get_aimeos(): \Aimeos\Bootstrap
     {
-        return $this->client->getAimeos();
+        return $this->client->get_aimeos();
     }
-
     /**
      * Sets the Aimeos bootstrap object
      *
      * @param \Aimeos\Bootstrap $aimeos The Aimeos bootstrap object
      * @return \Aimeos\Admin\JsonAdm\Iface Reference to this object for fluent calls
      */
-    public function setAimeos(\Aimeos\Bootstrap $aimeos): \Aimeos\Admin\JsonAdm\Iface
+    public function set_aimeos(\Aimeos\Bootstrap $aimeos): \Aimeos\Admin\Json_Adm\Iface
     {
-        parent::setAimeos($aimeos);
-
-        $this->client->setAimeos($aimeos);
+        parent::set_aimeos($aimeos);
+        $this->client->set_aimeos($aimeos);
         return $this;
     }
-
     /**
      * Sets the view object that will generate the admin output.
      *
      * @param \Aimeos\Base\View\Iface $view The view object which generates the admin output
      * @return \Aimeos\Admin\JsonAdm\Iface Reference to this object for fluent calls
      */
-    public function setView(\Aimeos\Base\View\Iface $view): \Aimeos\Admin\JsonAdm\Iface
+    public function set_view(\Aimeos\Base\View\Iface $view): \Aimeos\Admin\Json_Adm\Iface
     {
-        parent::setView($view);
-
-        $this->client->setView($view);
+        parent::set_view($view);
+        $this->client->set_view($view);
         return $this;
     }
-
     /**
      * Returns the underlying admin client object;
      *
      * @return \Aimeos\Admin\JsonAdm\Iface Admin client object
      */
-    protected function getClient(): \Aimeos\Admin\JsonAdm\Iface
+    protected function get_client(): \Aimeos\Admin\Json_Adm\Iface
     {
         return $this->client;
     }

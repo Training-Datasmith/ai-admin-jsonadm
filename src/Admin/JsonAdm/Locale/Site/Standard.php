@@ -1,26 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2016-2026
  * @package Admin
  * @subpackage JsonAdm
  */
+namespace Aimeos\Admin\Json_Adm\Locale\Site;
 
-namespace Aimeos\Admin\JsonAdm\Locale\Site;
-
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
+use Psr\Http\Message\Response_Interface;
+use Psr\Http\Message\Server_Request_Interface;
 /**
  * JSON API locale site  client
  *
  * @package Admin
  * @subpackage JsonAdm
  */
-class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\JsonAdm\Common\Iface
+class Standard extends \Aimeos\Admin\Json_Adm\Standard implements \Aimeos\Admin\Json_Adm\Common\Iface
 {
     /** admin/jsonadm/locale/site/decorators/excludes
      * Excludes decorators added by the "common" option from the JSON API clients
@@ -47,7 +44,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/locale/site/decorators/global
      * @see admin/jsonadm/locale/site/decorators/local
      */
-
     /** admin/jsonadm/locale/site/decorators/global
      * Adds a list of globally available decorators only to the Jsonadm client
      *
@@ -73,7 +69,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/locale/site/decorators/excludes
      * @see admin/jsonadm/locale/site/decorators/local
      */
-
     /** admin/jsonadm/locale/site/decorators/local
      * Adds a list of local decorators only to the Jsonadm client
      *
@@ -99,7 +94,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/locale/site/decorators/excludes
      * @see admin/jsonadm/locale/site/decorators/global
      */
-
     /**
      * Returns the requested resource or the resource list
      *
@@ -107,7 +101,7 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function get(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function get(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         /** admin/jsonadm/partials/locale/site/template-data
          * Relative path to the data partial template file for the locale site  client
@@ -124,8 +118,7 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
          * @since 2016.07
          * @category Developer
          */
-        $this->view()->assign([ 'partial-data' => 'admin/jsonadm/partials/locale/site/template-data' ]);
-
+        $this->view()->assign(['partial-data' => 'admin/jsonadm/partials/locale/site/template-data']);
         /** admin/jsonadm/partials/locale/site/template-included
          * Relative path to the included partial template file for the locale site  client
          *
@@ -141,11 +134,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
          * @since 2021.04
          * @category Developer
          */
-        $this->view()->assign([ 'partial-included' => 'admin/jsonadm/partials/locale/site/template-included' ]);
-
+        $this->view()->assign(['partial-included' => 'admin/jsonadm/partials/locale/site/template-included']);
         return parent::get($request, $response);
     }
-
     /**
      * Retrieves the item or items and adds the data to the view
      *
@@ -154,35 +145,29 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    protected function getItems(\Aimeos\Base\View\Iface $view, ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    protected function get_items(\Aimeos\Base\View\Iface $view, Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         $context = $this->context();
-        $manager = \Aimeos\MShop::create($context, 'locale/site');
-        $search = $this->initCriteria($manager->filter(), $view->param());
+        $manager = \Aimeos\M_Shop::create($context, 'locale/site');
+        $search = $this->init_criteria($manager->filter(), $view->param());
         $total = 1;
-
         if (!$view->access(['super'])) {
-            $customerManager = \Aimeos\MShop::create($context, 'customer');
-            $siteid = $customerManager->get($context->user())->getSiteId();
+            $customer_manager = \Aimeos\M_Shop::create($context, 'customer');
+            $siteid = $customer_manager->get($context->user())->get_site_id();
             $search->add($search->is('locale.site.siteid', $view->access(['admin']) ? '=~' : '==', $siteid));
         }
-
         if ($id = $view->param('id')) {
             $search->add($search->is('locale.site.id', '==', $id))->slice(0, 1);
-            $view->data = $manager->search($search, [], $total)
-                ->first(new \Aimeos\MShop\Exception($view->translate('admin', 'Item not available')));
+            $view->data = $manager->search($search, [], $total)->first(new \Aimeos\M_Shop\Exception($view->translate('admin', 'Item not available')));
         } else {
             $view->data = $manager->search($search, [], $total);
         }
-
-        $view->childItems = map();
-        $view->listItems = map();
-        $view->refItems = map();
+        $view->child_items = map();
+        $view->list_items = map();
+        $view->ref_items = map();
         $view->total = $total;
-
         return $response;
     }
-
     /**
      * Saves and returns the new or updated item
      *
@@ -190,38 +175,30 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \stdClass $entry Object including "id" and "attributes" elements
      * @return \Aimeos\MShop\Common\Item\Iface New or updated item
      */
-    protected function saveEntry(\Aimeos\MShop\Common\Manager\Iface $manager, \stdClass $entry): \Aimeos\MShop\Common\Item\Iface
+    protected function save_entry(\Aimeos\M_Shop\Common\Manager\Iface $manager, \stdClass $entry): \Aimeos\M_Shop\Common\Item\Iface
     {
         if (!$this->view()->access(['super', 'admin'])) {
-            throw new \Aimeos\Admin\JsonAdm\Exception('Not allowed');
+            throw new \Aimeos\Admin\Json_Adm\Exception('Not allowed');
         }
-
         if (isset($entry->id)) {
             $item = $manager->get($entry->id);
-
-            if (isset($entry->attributes) && ($attr = (array) $entry->attributes)) {
-                $item = $item->fromArray($attr, true);
+            if (isset($entry->attributes) && $attr = (array) $entry->attributes) {
+                $item = $item->from_array($attr, true);
             }
-
             $item = $manager->save($item);
         } else {
             if (!$this->view()->access(['super'])) {
-                throw new \Aimeos\Admin\JsonAdm\Exception('Not allowed');
+                throw new \Aimeos\Admin\Json_Adm\Exception('Not allowed');
             }
-
             $item = $manager->create();
-
-            if (isset($entry->attributes) && ($attr = (array) $entry->attributes)) {
-                $item = $item->fromArray($attr, true);
+            if (isset($entry->attributes) && $attr = (array) $entry->attributes) {
+                $item = $item->from_array($attr, true);
             }
-
             $item = $manager->insert($item);
         }
-
         if (isset($entry->relationships)) {
-            $this->saveRelationships($manager, $item, $entry->relationships);
+            $this->save_relationships($manager, $item, $entry->relationships);
         }
-
-        return $manager->get($item->getId());
+        return $manager->get($item->get_id());
     }
 }

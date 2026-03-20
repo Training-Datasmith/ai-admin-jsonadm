@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
-
-namespace Aimeos\Admin\JsonAdm\Attribute;
+namespace Aimeos\Admin\Json_Adm\Attribute;
 
 /**
  * JSON API attribute client
@@ -17,7 +15,7 @@ namespace Aimeos\Admin\JsonAdm\Attribute;
  * @package Admin
  * @subpackage JsonAdm
  */
-class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\JsonAdm\Common\Iface
+class Standard extends \Aimeos\Admin\Json_Adm\Standard implements \Aimeos\Admin\Json_Adm\Common\Iface
 {
     /** admin/jsonadm/attribute/decorators/excludes
      * Excludes decorators added by the "common" option from the JSON API clients
@@ -44,7 +42,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/attribute/decorators/global
      * @see admin/jsonadm/attribute/decorators/local
      */
-
     /** admin/jsonadm/attribute/decorators/global
      * Adds a list of globally available decorators only to the Jsonadm client
      *
@@ -70,7 +67,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/attribute/decorators/excludes
      * @see admin/jsonadm/attribute/decorators/local
      */
-
     /** admin/jsonadm/attribute/decorators/local
      * Adds a list of local decorators only to the Jsonadm client
      *
@@ -96,7 +92,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/attribute/decorators/excludes
      * @see admin/jsonadm/attribute/decorators/global
      */
-
     /**
      * Returns the list items for association relationships
      *
@@ -104,8 +99,8 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param array $include List of resource types that should be fetched
      * @return \Aimeos\Map List of items implementing \Aimeos\MShop\Common\Item\Lists\Iface
      */
-    protected function getListItems(\Aimeos\Map $items, array $include): \Aimeos\Map
+    protected function get_list_items(\Aimeos\Map $items, array $include): \Aimeos\Map
     {
-        return $items->getListItems(null, null, null, false)->collapse();
+        return $items->get_list_items(null, null, null, false)->collapse();
     }
 }

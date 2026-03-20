@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
-
-namespace Aimeos\Admin\JsonAdm;
+namespace Aimeos\Admin\Json_Adm;
 
 /**
  * \Exception for JSON API client classes

@@ -1,26 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2021-2026
  * @package Admin
  * @subpackage JsonAdm
  */
+namespace Aimeos\Admin\Json_Adm\Rule\Config;
 
-namespace Aimeos\Admin\JsonAdm\Rule\Config;
-
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
+use Psr\Http\Message\Response_Interface;
+use Psr\Http\Message\Server_Request_Interface;
 /**
  * JSON API rule config client
  *
  * @package Admin
  * @subpackage JsonAdm
  */
-class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\JsonAdm\Common\Iface
+class Standard extends \Aimeos\Admin\Json_Adm\Standard implements \Aimeos\Admin\Json_Adm\Common\Iface
 {
     /** admin/jsonadm/rule/config/decorators/excludes
      * Excludes decorators added by the "common" option from the JSON API clients
@@ -47,7 +44,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/rule/config/decorators/global
      * @see admin/jsonadm/rule/config/decorators/local
      */
-
     /** admin/jsonadm/rule/config/decorators/global
      * Adds a list of globally available decorators only to the Jsonadm client
      *
@@ -73,7 +69,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/rule/config/decorators/excludes
      * @see admin/jsonadm/rule/config/decorators/local
      */
-
     /** admin/jsonadm/rule/config/decorators/local
      * Adds a list of local decorators only to the Jsonadm client
      *
@@ -99,7 +94,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/rule/config/decorators/excludes
      * @see admin/jsonadm/rule/config/decorators/global
      */
-
     /**
      * Returns the requested resource or the resource list
      *
@@ -107,27 +101,19 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function get(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function get(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         $view = $this->view();
-
         try {
-            $response = $this->getItems($view, $request, $response);
+            $response = $this->get_items($view, $request, $response);
             $status = 200;
-        } catch (\Aimeos\MShop\Exception $e) {
+        } catch (\Aimeos\M_Shop\Exception $e) {
             $status = 404;
-            $view->errors = [ [
-                'title' => $this->context()->translate('mshop', $e->getMessage()),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $this->context()->translate('mshop', $e->get_message()), 'detail' => $e->get_trace_as_string()]];
         } catch (\Exception $e) {
             $status = 500;
-            $view->errors = [ [
-                'title' => $e->getMessage(),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $e->get_message(), 'detail' => $e->get_trace_as_string()]];
         }
-
         /** admin/jsonadm/rule/config/template-get
          * Relative path to the JSON API template for GET requests
          *
@@ -149,14 +135,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
          */
         $tplconf = 'admin/jsonadm/rule/config/template-get';
         $default = 'config';
-
         $body = $view->render($view->config($tplconf, $default));
-
-        return $response->withHeader('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')
-            ->withBody($view->response()->createStreamFromString($body))
-            ->withStatus($status);
+        return $response->with_header('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')->with_body($view->response()->create_stream_from_string($body))->with_status($status);
     }
-
     /**
      * Retrieves the item or items and adds the data to the view
      *
@@ -165,17 +146,14 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    protected function getItems(\Aimeos\Base\View\Iface $view, ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    protected function get_items(\Aimeos\Base\View\Iface $view, Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         if (($id = $view->param('id')) == null) {
-            throw new \Aimeos\Admin\JsonAdm\Exception('No ID given', 400);
+            throw new \Aimeos\Admin\Json_Adm\Exception('No ID given', 400);
         }
-
-        $manager = \Aimeos\MShop::create($this->context(), 'rule');
-        $item = $manager->create()->setProvider($id);
-
-        $view->configItems = $manager->getProvider($item, $view->param('type', 'catalog'))->getConfigBE();
-
+        $manager = \Aimeos\M_Shop::create($this->context(), 'rule');
+        $item = $manager->create()->set_provider($id);
+        $view->config_items = $manager->get_provider($item, $view->param('type', 'catalog'))->get_config_be();
         return $response;
     }
 }

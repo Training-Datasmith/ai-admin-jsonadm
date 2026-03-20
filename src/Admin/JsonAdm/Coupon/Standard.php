@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
-
-namespace Aimeos\Admin\JsonAdm\Coupon;
+namespace Aimeos\Admin\Json_Adm\Coupon;
 
 /**
  * JSON API coupon client
@@ -17,7 +15,7 @@ namespace Aimeos\Admin\JsonAdm\Coupon;
  * @package Admin
  * @subpackage JsonAdm
  */
-class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\JsonAdm\Common\Iface
+class Standard extends \Aimeos\Admin\Json_Adm\Standard implements \Aimeos\Admin\Json_Adm\Common\Iface
 {
     /** admin/jsonadm/coupon/decorators/excludes
      * Excludes decorators added by the "common" option from the JSON API clients
@@ -44,7 +42,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/coupon/decorators/global
      * @see admin/jsonadm/coupon/decorators/local
      */
-
     /** admin/jsonadm/coupon/decorators/global
      * Adds a list of globally available decorators only to the Jsonadm client
      *
@@ -70,7 +67,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/coupon/decorators/excludes
      * @see admin/jsonadm/coupon/decorators/local
      */
-
     /** admin/jsonadm/coupon/decorators/local
      * Adds a list of local decorators only to the Jsonadm client
      *
@@ -96,7 +92,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/coupon/decorators/excludes
      * @see admin/jsonadm/coupon/decorators/global
      */
-
     /**
      * Returns the items with parent/child relationships
      *
@@ -104,21 +99,17 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param array $include List of resource types that should be fetched
      * @return \Aimeos\Map List of items implementing \Aimeos\MShop\Common\Item\Iface
      */
-    protected function getChildItems(\Aimeos\Map $items, array $include): \Aimeos\Map
+    protected function get_child_items(\Aimeos\Map $items, array $include): \Aimeos\Map
     {
         $list = map();
-        $ids = $items->keys()->toArray();
-        $include = array_intersect($include, [ 'coupon/code' ]);
-
+        $ids = $items->keys()->to_array();
+        $include = array_intersect($include, ['coupon/code']);
         foreach ($include as $type) {
-            $manager = \Aimeos\MShop::create($this->context(), $type);
-
+            $manager = \Aimeos\M_Shop::create($this->context(), $type);
             $search = $manager->filter();
-            $search->setConditions($search->compare('==', str_replace('/', '.', $type) . '.parentid', $ids));
-
+            $search->set_conditions($search->compare('==', str_replace('/', '.', $type) . '.parentid', $ids));
             $list = $list->merge($manager->search($search));
         }
-
         return $list;
     }
 }

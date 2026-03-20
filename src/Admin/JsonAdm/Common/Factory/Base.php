@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
-
-namespace Aimeos\Admin\JsonAdm\Common\Factory;
+namespace Aimeos\Admin\Json_Adm\Common\Factory;
 
 /**
  * Common methods for all JSON API factories
@@ -20,7 +18,6 @@ namespace Aimeos\Admin\JsonAdm\Common\Factory;
 class Base
 {
     private static array $objects = [];
-
     /**
      * Injects a client object
      *
@@ -30,11 +27,10 @@ class Base
      * @param string $classname Full name of the class for which the object should be returned
      * @param \Aimeos\Admin\JsonAdm\Iface|null $client JSON API client object
      */
-    public static function injectClient(string $classname, ?\Aimeos\Admin\JsonAdm\Iface $client = null): void
+    public static function inject_client(string $classname, ?\Aimeos\Admin\Json_Adm\Iface $client = null): void
     {
         self::$objects[$classname] = $client;
     }
-
     /**
      * Adds the decorators to the JSON API client object
      *
@@ -43,13 +39,9 @@ class Base
      * @param string $path Name of the client separated by slashes, e.g "product/property"
      * @return \Aimeos\Admin\JsonAdm\Iface Client object
      */
-    protected static function addClientDecorators(
-        \Aimeos\Admin\JsonAdm\Iface $client,
-        \Aimeos\MShop\ContextIface $context,
-        string $path
-    ): \Aimeos\Admin\JsonAdm\Iface {
+    protected static function add_client_decorators(\Aimeos\Admin\Json_Adm\Iface $client, \Aimeos\M_Shop\Context_Iface $context, string $path): \Aimeos\Admin\Json_Adm\Iface
+    {
         $config = $context->config();
-
         /** admin/jsonadm/common/decorators/default
          * Configures the list of decorators applied to all JSON API clients
          *
@@ -73,36 +65,28 @@ class Base
          * @category Developer
          */
         $decorators = $config->get('admin/jsonadm/common/decorators/default', []);
-
         if (empty($path)) {
-            $classprefix = '\\Aimeos\\Admin\\JsonAdm\\Common\\Decorator\\';
-            return self::addDecorators($client, $decorators, $classprefix, $context, $path);
+            $classprefix = '\Aimeos\Admin\JsonAdm\Common\Decorator\\';
+            return self::add_decorators($client, $decorators, $classprefix, $context, $path);
         }
-
         $dpath = trim($path, '/');
-        $dpath = ($dpath !== '' ? $dpath . '/' : $dpath);
-
+        $dpath = $dpath !== '' ? $dpath . '/' : $dpath;
         $excludes = $config->get('admin/jsonadm/' . $dpath . 'decorators/excludes', []);
-        $localClass = str_replace('/', '\\', ucwords($path, '/'));
-
+        $local_class = str_replace('/', '\\', ucwords($path, '/'));
         foreach ($decorators as $key => $name) {
             if (in_array($name, $excludes)) {
                 unset($decorators[$key]);
             }
         }
-
-        $classprefix = '\\Aimeos\\Admin\\JsonAdm\\Common\\Decorator\\';
-        $client = self::addDecorators($client, $decorators, $classprefix, $context, $path);
-
-        $classprefix = '\\Aimeos\\Admin\\JsonAdm\\Common\\Decorator\\';
+        $classprefix = '\Aimeos\Admin\JsonAdm\Common\Decorator\\';
+        $client = self::add_decorators($client, $decorators, $classprefix, $context, $path);
+        $classprefix = '\Aimeos\Admin\JsonAdm\Common\Decorator\\';
         $decorators = $config->get('admin/jsonadm/' . $dpath . 'decorators/global', []);
-        $client = self::addDecorators($client, $decorators, $classprefix, $context, $path);
-
-        $classprefix = '\\Aimeos\\Admin\\JsonAdm\\' . ucfirst($localClass) . '\\Decorator\\';
+        $client = self::add_decorators($client, $decorators, $classprefix, $context, $path);
+        $classprefix = '\Aimeos\Admin\JsonAdm\\' . ucfirst($local_class) . '\Decorator\\';
         $decorators = $config->get('admin/jsonadm/' . $dpath . 'decorators/local', []);
-        return self::addDecorators($client, $decorators, $classprefix, $context, $path);
+        return self::add_decorators($client, $decorators, $classprefix, $context, $path);
     }
-
     /**
      * Adds the decorators to the client object
      *
@@ -114,26 +98,17 @@ class Base
      * @return \Aimeos\Admin\JsonAdm\Iface Client object
      * @throws \LogicException If class can't be instantiated
      */
-    protected static function addDecorators(
-        \Aimeos\Admin\JsonAdm\Iface $client,
-        array $decorators,
-        string $classprefix,
-        \Aimeos\MShop\ContextIface $context,
-        string $path
-    ): \Aimeos\Admin\JsonAdm\Iface {
-        $interface = \Aimeos\Admin\JsonAdm\Common\Decorator\Iface::class;
-
+    protected static function add_decorators(\Aimeos\Admin\Json_Adm\Iface $client, array $decorators, string $classprefix, \Aimeos\M_Shop\Context_Iface $context, string $path): \Aimeos\Admin\Json_Adm\Iface
+    {
+        $interface = \Aimeos\Admin\Json_Adm\Common\Decorator\Iface::class;
         foreach ($decorators as $name) {
             if (ctype_alnum($name) === false) {
                 throw new \LogicException(sprintf('Invalid class name "%1$s"', $name), 400);
             }
-
             $client = \Aimeos\Utils::create($classprefix . $name, [$client, $context, $path], $interface);
         }
-
         return $client;
     }
-
     /**
      * Creates a new client object
      *
@@ -143,12 +118,8 @@ class Base
      * @param string $path Name of the client separated by slashes, e.g "product/property"
      * @return \Aimeos\Admin\JsonAdm\Common\Iface Client object
      */
-    protected static function createAdmin(
-        string $classname,
-        string $interface,
-        \Aimeos\MShop\ContextIface $context,
-        string $path
-    ): \Aimeos\Admin\JsonAdm\Common\Iface {
+    protected static function create_admin(string $classname, string $interface, \Aimeos\M_Shop\Context_Iface $context, string $path): \Aimeos\Admin\Json_Adm\Common\Iface
+    {
         return self::$objects[$classname] ?? \Aimeos\Utils::create($classname, [$context, $path], $interface);
     }
 }

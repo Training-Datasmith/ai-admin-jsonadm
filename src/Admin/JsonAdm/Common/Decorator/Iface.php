@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
-
-namespace Aimeos\Admin\JsonAdm\Common\Decorator;
+namespace Aimeos\Admin\Json_Adm\Common\Decorator;
 
 /**
  * Decorator interface for JSON API client
@@ -17,7 +15,7 @@ namespace Aimeos\Admin\JsonAdm\Common\Decorator;
  * @package Admin
  * @subpackage JsonAdm
  */
-interface Iface extends \Aimeos\Admin\JsonAdm\Iface
+interface Iface extends \Aimeos\Admin\Json_Adm\Iface
 {
     /**
      * Initializes a new client decorator object
@@ -26,5 +24,5 @@ interface Iface extends \Aimeos\Admin\JsonAdm\Iface
      * @param \Aimeos\MShop\ContextIface $context Context object with required objects
      * @param string $path Name of the client separated by slashes, e.g "product/stock"
      */
-    public function __construct(\Aimeos\Admin\JsonAdm\Iface $client, \Aimeos\MShop\ContextIface $context, string $path);
+    public function __construct(\Aimeos\Admin\Json_Adm\Iface $client, \Aimeos\M_Shop\Context_Iface $context, string $path);
 }

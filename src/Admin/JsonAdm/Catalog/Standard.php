@@ -1,26 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
+namespace Aimeos\Admin\Json_Adm\Catalog;
 
-namespace Aimeos\Admin\JsonAdm\Catalog;
-
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
+use Psr\Http\Message\Response_Interface;
+use Psr\Http\Message\Server_Request_Interface;
 /**
  * JSON API catalog client
  *
  * @package Admin
  * @subpackage JsonAdm
  */
-class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\JsonAdm\Common\Iface
+class Standard extends \Aimeos\Admin\Json_Adm\Standard implements \Aimeos\Admin\Json_Adm\Common\Iface
 {
     /** admin/jsonadm/catalog/decorators/excludes
      * Excludes decorators added by the "common" option from the JSON API clients
@@ -47,7 +44,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/catalog/decorators/global
      * @see admin/jsonadm/catalog/decorators/local
      */
-
     /** admin/jsonadm/catalog/decorators/global
      * Adds a list of globally available decorators only to the Jsonadm client
      *
@@ -73,7 +69,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/catalog/decorators/excludes
      * @see admin/jsonadm/catalog/decorators/local
      */
-
     /** admin/jsonadm/catalog/decorators/local
      * Adds a list of local decorators only to the Jsonadm client
      *
@@ -99,7 +94,6 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @see admin/jsonadm/catalog/decorators/excludes
      * @see admin/jsonadm/catalog/decorators/global
      */
-
     /**
      * Returns the requested resource or the resource list
      *
@@ -107,7 +101,7 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function get(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function get(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         /** admin/jsonadm/partials/catalog/template-data
          * Relative path to the data partial template file for the catalog client
@@ -124,11 +118,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
          * @since 2016.07
          * @category Developer
          */
-        $this->view()->assign([ 'partial-data' => 'admin/jsonadm/partials/catalog/template-data' ]);
-
+        $this->view()->assign(['partial-data' => 'admin/jsonadm/partials/catalog/template-data']);
         return parent::get($request, $response);
     }
-
     /**
      * Returns the items with parent/child relationships
      *
@@ -136,19 +128,16 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param array $include List of resource types that should be fetched
      * @return \Aimeos\Map List of items implementing \Aimeos\MShop\Common\Item\Iface
      */
-    protected function getChildItems(\Aimeos\Map $items, array $include): \Aimeos\Map
+    protected function get_child_items(\Aimeos\Map $items, array $include): \Aimeos\Map
     {
         $list = map();
-
         if (in_array('catalog', $include)) {
             foreach ($items as $item) {
-                $list = $list->push($item)->merge($this->getChildItems(map($item->getChildren()), $include));
+                $list = $list->push($item)->merge($this->get_child_items(map($item->get_children()), $include));
             }
         }
-
         return $list;
     }
-
     /**
      * Retrieves the item or items and adds the data to the view
      *
@@ -156,41 +145,34 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    protected function getItems(\Aimeos\Base\View\Iface $view, ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    protected function get_items(\Aimeos\Base\View\Iface $view, Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
-        $manager = \Aimeos\MShop::create($this->context(), 'catalog');
-
+        $manager = \Aimeos\M_Shop::create($this->context(), 'catalog');
         if (($key = $view->param('aggregate')) !== null) {
-            $search = $this->initCriteria($manager->filter(), $view->param());
+            $search = $this->init_criteria($manager->filter(), $view->param());
             $view->data = $manager->aggregate($search, explode(',', $key));
             return $response;
         }
-
-        $include = (($include = $view->param('include')) !== null ? explode(',', $include) : []);
-        $search = $this->initCriteria($manager->filter(), $view->param());
+        $include = ($include = $view->param('include')) !== null ? explode(',', $include) : [];
+        $search = $this->init_criteria($manager->filter(), $view->param());
         $total = 1;
-
         if (($id = $view->param('id')) == null) {
             $view->data = $manager->search($search, $include, $total);
-            $view->listItems = $this->getListItems($view->data, $include);
-            $view->childItems = map();
+            $view->list_items = $this->get_list_items($view->data, $include);
+            $view->child_items = map();
         } else {
             $level = \Aimeos\MW\Tree\Manager\Base::LEVEL_ONE;
             if (in_array('catalog', $include)) {
                 $level = \Aimeos\MW\Tree\Manager\Base::LEVEL_LIST;
             }
-
-            $view->data = $manager->getTree($id, $include, $level, $search);
-            $view->listItems = $this->getListItems(map([$id => $view->data]), $include);
-            $view->childItems = $this->getChildItems(map($view->data->getChildren()), $include);
+            $view->data = $manager->get_tree($id, $include, $level, $search);
+            $view->list_items = $this->get_list_items(map([$id => $view->data]), $include);
+            $view->child_items = $this->get_child_items(map($view->data->get_children()), $include);
         }
-
-        $view->refItems = $this->getRefItems($view->listItems);
+        $view->ref_items = $this->get_ref_items($view->list_items);
         $view->total = $total;
-
         return $response;
     }
-
     /**
      * Returns the list items for association relationships
      *
@@ -198,11 +180,10 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param array $include List of resource types that should be fetched
      * @return \Aimeos\Map List of items implementing \Aimeos\MShop\Common\Item\Lists\Iface
      */
-    protected function getListItems(\Aimeos\Map $items, array $include): \Aimeos\Map
+    protected function get_list_items(\Aimeos\Map $items, array $include): \Aimeos\Map
     {
-        return $items->getListItems(null, null, null, false)->collapse();
+        return $items->get_list_items(null, null, null, false)->collapse();
     }
-
     /**
      * Saves and returns the new or updated item
      *
@@ -210,37 +191,29 @@ class Standard extends \Aimeos\Admin\JsonAdm\Standard implements \Aimeos\Admin\J
      * @param \stdClass $entry Object including "id" and "attributes" elements
      * @return \Aimeos\MShop\Common\Item\Iface New or updated item
      */
-    protected function saveEntry(\Aimeos\MShop\Common\Manager\Iface $manager, \stdClass $entry): \Aimeos\MShop\Common\Item\Iface
+    protected function save_entry(\Aimeos\M_Shop\Common\Manager\Iface $manager, \stdClass $entry): \Aimeos\M_Shop\Common\Item\Iface
     {
-        $targetId = ($entry->targetid ?? null);
-        $refId = ($entry->refid ?? null);
-
+        $target_id = $entry->targetid ?? null;
+        $ref_id = $entry->refid ?? null;
         if (isset($entry->id)) {
             $item = $manager->get($entry->id);
-
-            if (isset($entry->attributes) && ($attr = (array) $entry->attributes)) {
-                $item = $item->fromArray($attr, true);
+            if (isset($entry->attributes) && $attr = (array) $entry->attributes) {
+                $item = $item->from_array($attr, true);
             }
-
             $item = $manager->save($item);
-
-            if (isset($entry->parentid) && $targetId !== null) {
-                $manager->move($item->getId(), $entry->parentid, $targetId, $refId);
+            if (isset($entry->parentid) && $target_id !== null) {
+                $manager->move($item->get_id(), $entry->parentid, $target_id, $ref_id);
             }
         } else {
             $item = $manager->create();
-
-            if (isset($entry->attributes) && ($attr = (array) $entry->attributes)) {
-                $item = $item->fromArray($attr, true);
+            if (isset($entry->attributes) && $attr = (array) $entry->attributes) {
+                $item = $item->from_array($attr, true);
             }
-
-            $item = $manager->insert($item, $targetId, $refId);
+            $item = $manager->insert($item, $target_id, $ref_id);
         }
-
         if (isset($entry->relationships)) {
-            $this->saveRelationships($manager, $item, $entry->relationships);
+            $this->save_relationships($manager, $item, $entry->relationships);
         }
-
-        return $manager->get($item->getId());
+        return $manager->get($item->get_id());
     }
 }

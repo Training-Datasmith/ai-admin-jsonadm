@@ -1,26 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
+namespace Aimeos\Admin\Json_Adm;
 
-namespace Aimeos\Admin\JsonAdm;
-
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
+use Psr\Http\Message\Response_Interface;
+use Psr\Http\Message\Server_Request_Interface;
 /**
  * JSON API standard client
  *
  * @package Admin
  * @subpackage JsonAdm
  */
-class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonAdm\Common\Iface
+class Standard extends \Aimeos\Admin\Json_Adm\Base implements \Aimeos\Admin\Json_Adm\Common\Iface
 {
     /**
      * Deletes the resource or the resource list
@@ -29,33 +26,22 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function delete(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function delete(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         $view = $this->view();
-
         try {
-            $response = $this->deleteItems($view, $request, $response);
+            $response = $this->delete_items($view, $request, $response);
             $status = 200;
-        } catch (\Aimeos\Admin\JsonAdm\Exception $e) {
-            $status = $e->getCode();
-            $view->errors = [ [
-                'title' => $this->context()->translate('admin/jsonadm', $e->getMessage()),
-                'detail' => $e->getTraceAsString(),
-            ] ];
-        } catch (\Aimeos\MShop\Exception $e) {
+        } catch (\Aimeos\Admin\Json_Adm\Exception $e) {
+            $status = $e->get_code();
+            $view->errors = [['title' => $this->context()->translate('admin/jsonadm', $e->get_message()), 'detail' => $e->get_trace_as_string()]];
+        } catch (\Aimeos\M_Shop\Exception $e) {
             $status = 404;
-            $view->errors = [ [
-                'title' => $this->context()->translate('mshop', $e->getMessage()),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $this->context()->translate('mshop', $e->get_message()), 'detail' => $e->get_trace_as_string()]];
         } catch (\Exception $e) {
             $status = 500;
-            $view->errors = [ [
-                'title' => $e->getMessage(),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $e->get_message(), 'detail' => $e->get_trace_as_string()]];
         }
-
         /** admin/jsonadm/template-delete
          * Relative path to the JSON API template for DELETE requests
          *
@@ -83,14 +69,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
          */
         $tplconf = 'admin/jsonadm/template-delete';
         $default = 'delete';
-
         $body = $view->render($view->config($tplconf, $default));
-
-        return $response->withHeader('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')
-            ->withBody($view->response()->createStreamFromString($body))
-            ->withStatus($status);
+        return $response->with_header('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')->with_body($view->response()->create_stream_from_string($body))->with_status($status);
     }
-
     /**
      * Returns the requested resource or the resource list
      *
@@ -98,27 +79,19 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function get(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function get(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         $view = $this->view();
-
         try {
-            $response = $this->getItems($view, $request, $response);
+            $response = $this->get_items($view, $request, $response);
             $status = 200;
-        } catch (\Aimeos\MShop\Exception $e) {
+        } catch (\Aimeos\M_Shop\Exception $e) {
             $status = 404;
-            $view->errors = [ [
-                'title' => $this->context()->translate('mshop', $e->getMessage()),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $this->context()->translate('mshop', $e->get_message()), 'detail' => $e->get_trace_as_string()]];
         } catch (\Exception $e) {
             $status = 500;
-            $view->errors = [ [
-                'title' => $e->getMessage(),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $e->get_message(), 'detail' => $e->get_trace_as_string()]];
         }
-
         if ($view->param('aggregate') !== null) {
             /** admin/jsonadm/template-aggregate
              * Relative path to the JSON API template for GET aggregate requests
@@ -176,14 +149,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
             $tplconf = 'admin/jsonadm/template-get';
             $default = 'get';
         }
-
         $body = $view->render($view->config($tplconf, $default));
-
-        return $response->withHeader('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')
-            ->withBody($view->response()->createStreamFromString($body))
-            ->withStatus($status);
+        return $response->with_header('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')->with_body($view->response()->create_stream_from_string($body))->with_status($status);
     }
-
     /**
      * Updates the resource or the resource list partitially
      *
@@ -191,33 +159,22 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function patch(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function patch(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         $view = $this->view();
-
         try {
-            $response = $this->patchItems($view, $request, $response);
+            $response = $this->patch_items($view, $request, $response);
             $status = 200;
-        } catch (\Aimeos\Admin\JsonAdm\Exception $e) {
-            $status = $e->getCode();
-            $view->errors = [ [
-                'title' => $this->context()->translate('admin/jsonadm', $e->getMessage()),
-                'detail' => $e->getTraceAsString(),
-            ] ];
-        } catch (\Aimeos\MShop\Exception $e) {
+        } catch (\Aimeos\Admin\Json_Adm\Exception $e) {
+            $status = $e->get_code();
+            $view->errors = [['title' => $this->context()->translate('admin/jsonadm', $e->get_message()), 'detail' => $e->get_trace_as_string()]];
+        } catch (\Aimeos\M_Shop\Exception $e) {
             $status = 404;
-            $view->errors = [ [
-                'title' => $this->context()->translate('mshop', $e->getMessage()),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $this->context()->translate('mshop', $e->get_message()), 'detail' => $e->get_trace_as_string()]];
         } catch (\Exception $e) {
             $status = 500;
-            $view->errors = [ [
-                'title' => $e->getMessage(),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $e->get_message(), 'detail' => $e->get_trace_as_string()]];
         }
-
         /** admin/jsonadm/template-patch
          * Relative path to the JSON API template for PATCH requests
          *
@@ -245,14 +202,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
          */
         $tplconf = 'admin/jsonadm/template-patch';
         $default = 'patch';
-
         $body = $view->render($view->config($tplconf, $default));
-
-        return $response->withHeader('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')
-            ->withBody($view->response()->createStreamFromString($body))
-            ->withStatus($status);
+        return $response->with_header('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')->with_body($view->response()->create_stream_from_string($body))->with_status($status);
     }
-
     /**
      * Creates or updates the resource or the resource list
      *
@@ -260,33 +212,22 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function post(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function post(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         $view = $this->view();
-
         try {
-            $response = $this->postItems($view, $request, $response);
+            $response = $this->post_items($view, $request, $response);
             $status = 201;
-        } catch (\Aimeos\Admin\JsonAdm\Exception $e) {
-            $status = $e->getCode();
-            $view->errors = [ [
-                'title' => $this->context()->translate('admin/jsonadm', $e->getMessage()),
-                'detail' => $e->getTraceAsString(),
-            ] ];
-        } catch (\Aimeos\MShop\Exception $e) {
+        } catch (\Aimeos\Admin\Json_Adm\Exception $e) {
+            $status = $e->get_code();
+            $view->errors = [['title' => $this->context()->translate('admin/jsonadm', $e->get_message()), 'detail' => $e->get_trace_as_string()]];
+        } catch (\Aimeos\M_Shop\Exception $e) {
             $status = 404;
-            $view->errors = [ [
-                'title' => $this->context()->translate('mshop', $e->getMessage()),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $this->context()->translate('mshop', $e->get_message()), 'detail' => $e->get_trace_as_string()]];
         } catch (\Exception $e) {
             $status = 500;
-            $view->errors = [ [
-                'title' => $e->getMessage(),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $e->get_message(), 'detail' => $e->get_trace_as_string()]];
         }
-
         /** admin/jsonadm/template-post
          * Relative path to the JSON API template for POST requests
          *
@@ -314,14 +255,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
          */
         $tplconf = 'admin/jsonadm/template-post';
         $default = 'post';
-
         $body = $view->render($view->config($tplconf, $default));
-
-        return $response->withHeader('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')
-            ->withBody($view->response()->createStreamFromString($body))
-            ->withStatus($status);
+        return $response->with_header('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')->with_body($view->response()->create_stream_from_string($body))->with_status($status);
     }
-
     /**
      * Creates or updates the resource or the resource list
      *
@@ -329,15 +265,11 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function put(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function put(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         $status = 501;
         $view = $this->view();
-
-        $view->errors = [ [
-            'title' => $this->context()->translate('admin/jsonadm', 'Not implemented, use PATCH instead'),
-        ] ];
-
+        $view->errors = [['title' => $this->context()->translate('admin/jsonadm', 'Not implemented, use PATCH instead')]];
         /** admin/jsonadm/template-put
          * Relative path to the JSON API template for PUT requests
          *
@@ -365,14 +297,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
          */
         $tplconf = 'admin/jsonadm/template-put';
         $default = 'put';
-
         $body = $view->render($view->config($tplconf, $default));
-
-        return $response->withHeader('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')
-            ->withBody($view->response()->createStreamFromString($body))
-            ->withStatus($status);
+        return $response->with_header('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')->with_body($view->response()->create_stream_from_string($body))->with_status($status);
     }
-
     /**
      * Returns the available REST verbs and the available resources
      *
@@ -380,42 +307,30 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    public function options(ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    public function options(Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
         $context = $this->context();
         $view = $this->view();
-
         try {
             $resources = $attributes = [];
-
-            foreach ($this->getDomains($view) as $domain) {
-                $manager = \Aimeos\MShop::create($context, $domain);
-                $attributes = array_merge($attributes, $manager->getSearchAttributes(true));
+            foreach ($this->get_domains($view) as $domain) {
+                $manager = \Aimeos\M_Shop::create($context, $domain);
+                $attributes = array_merge($attributes, $manager->get_search_attributes(true));
                 $resources[] = join('/', $manager->type());
             }
-
-            foreach ($this->getResources($view) as $resource) {
+            foreach ($this->get_resources($view) as $resource) {
                 $resources[] = $resource;
             }
-
-            $view->resources = $this->getAllowedResources($view, $resources);
+            $view->resources = $this->get_allowed_resources($view, $resources);
             $view->attributes = $attributes;
-
             $status = 200;
-        } catch (\Aimeos\MShop\Exception $e) {
+        } catch (\Aimeos\M_Shop\Exception $e) {
             $status = 404;
-            $view->errors = [ [
-                'title' => $context->translate('mshop', $e->getMessage()),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $context->translate('mshop', $e->get_message()), 'detail' => $e->get_trace_as_string()]];
         } catch (\Exception $e) {
             $status = 500;
-            $view->errors = [ [
-                'title' => $e->getMessage(),
-                'detail' => $e->getTraceAsString(),
-            ] ];
+            $view->errors = [['title' => $e->get_message(), 'detail' => $e->get_trace_as_string()]];
         }
-
         /** admin/jsonadm/template-options
          * Relative path to the JSON API template for OPTIONS requests
          *
@@ -443,15 +358,9 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
          */
         $tplconf = 'admin/jsonadm/template-options';
         $default = 'options';
-
         $body = $view->render($view->config($tplconf, $default));
-
-        return $response->withHeader('Allow', 'DELETE,GET,PATCH,POST,OPTIONS')
-            ->withHeader('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')
-            ->withBody($view->response()->createStreamFromString($body))
-            ->withStatus($status);
+        return $response->with_header('Allow', 'DELETE,GET,PATCH,POST,OPTIONS')->with_header('Content-Type', 'application/vnd.api+json; supported-ext="bulk"')->with_body($view->response()->create_stream_from_string($body))->with_status($status);
     }
-
     /**
      * Deletes one or more items
      *
@@ -461,28 +370,23 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      * @throws \Aimeos\Admin\JsonAdm\Exception If the request body is invalid
      */
-    protected function deleteItems(\Aimeos\Base\View\Iface $view, ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    protected function delete_items(\Aimeos\Base\View\Iface $view, Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
-        $manager = \Aimeos\MShop::create($this->context(), $this->getPath());
-
+        $manager = \Aimeos\M_Shop::create($this->context(), $this->get_path());
         if (($id = $view->param('id')) == null) {
-            $body = (string) $request->getBody();
-
+            $body = (string) $request->get_body();
             if (($payload = json_decode($body)) === null || !isset($payload->data) || !is_array($payload->data)) {
-                throw new \Aimeos\Admin\JsonAdm\Exception('Invalid JSON in body', 400);
+                throw new \Aimeos\Admin\Json_Adm\Exception('Invalid JSON in body', 400);
             }
-
             $ids = map($payload->data)->col('id');
-            $manager->delete($ids->toArray());
+            $manager->delete($ids->to_array());
             $view->total = count($ids);
         } else {
             $manager->delete($id);
             $view->total = 1;
         }
-
         return $response;
     }
-
     /**
      * Retrieves the item or items and adds the data to the view
      *
@@ -491,36 +395,30 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    protected function getItems(\Aimeos\Base\View\Iface $view, ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    protected function get_items(\Aimeos\Base\View\Iface $view, Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
-        $manager = \Aimeos\MShop::create($this->context(), $this->getPath());
-
+        $manager = \Aimeos\M_Shop::create($this->context(), $this->get_path());
         if (($key = $view->param('aggregate')) !== null) {
-            $search = $this->initCriteria($manager->filter(), $view->param());
+            $search = $this->init_criteria($manager->filter(), $view->param());
             $view->data = $manager->aggregate($search, explode(',', $key), $view->param('value'), $view->param('type'));
             return $response;
         }
-
         $total = 1;
-        $include = (($include = $view->param('include')) !== null ? explode(',', $include) : []);
-
+        $include = ($include = $view->param('include')) !== null ? explode(',', $include) : [];
         if (($id = $view->param('id')) == null) {
-            $search = $this->initCriteria($manager->filter(), $view->param());
+            $search = $this->init_criteria($manager->filter(), $view->param());
             $view->data = $manager->search($search, $include, $total);
-            $view->childItems = $this->getChildItems($view->data, $include);
-            $view->listItems = $this->getListItems($view->data, $include);
+            $view->child_items = $this->get_child_items($view->data, $include);
+            $view->list_items = $this->get_list_items($view->data, $include);
         } else {
             $view->data = $manager->get($id, $include);
-            $view->childItems = $this->getChildItems(map([$id => $view->data]), $include);
-            $view->listItems = $this->getListItems(map([$id => $view->data]), $include);
+            $view->child_items = $this->get_child_items(map([$id => $view->data]), $include);
+            $view->list_items = $this->get_list_items(map([$id => $view->data]), $include);
         }
-
-        $view->refItems = $this->getRefItems($view->listItems);
+        $view->ref_items = $this->get_ref_items($view->list_items);
         $view->total = $total;
-
         return $response;
     }
-
     /**
      * Saves new attributes for one or more items
      *
@@ -530,35 +428,28 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      * @throws \Aimeos\Admin\JsonAdm\Exception If "id" parameter isn't available or the body is invalid
      */
-    protected function patchItems(\Aimeos\Base\View\Iface $view, ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    protected function patch_items(\Aimeos\Base\View\Iface $view, Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
-        $body = (string) $request->getBody();
-
+        $body = (string) $request->get_body();
         if (($payload = json_decode($body)) === null || !isset($payload->data)) {
-            throw new \Aimeos\Admin\JsonAdm\Exception('Invalid JSON in body', 400);
+            throw new \Aimeos\Admin\Json_Adm\Exception('Invalid JSON in body', 400);
         }
-
-        $manager = \Aimeos\MShop::create($this->context(), $this->getPath());
-
+        $manager = \Aimeos\M_Shop::create($this->context(), $this->get_path());
         if (is_array($payload->data)) {
-            $data = $this->saveData($manager, $payload);
-
+            $data = $this->save_data($manager, $payload);
             $view->data = $data;
             $view->total = count($data);
-            $response = $response->withHeader('Content-Type', 'application/vnd.api+json; ext="bulk"; supported-ext="bulk"');
+            $response = $response->with_header('Content-Type', 'application/vnd.api+json; ext="bulk"; supported-ext="bulk"');
         } elseif (($id = $view->param('id')) != null) {
             $payload->data->id = $id;
-            $data = $this->saveEntry($manager, $payload->data);
-
+            $data = $this->save_entry($manager, $payload->data);
             $view->data = $data;
             $view->total = 1;
         } else {
-            throw new \Aimeos\Admin\JsonAdm\Exception('No ID given', 400);
+            throw new \Aimeos\Admin\Json_Adm\Exception('No ID given', 400);
         }
-
         return $response;
     }
-
     /**
      * Creates one or more new items
      *
@@ -567,34 +458,27 @@ class Standard extends \Aimeos\Admin\JsonAdm\Base implements \Aimeos\Admin\JsonA
      * @param \Psr\Http\Message\ResponseInterface $response Response object
      * @return \Psr\Http\Message\ResponseInterface Modified response object
      */
-    protected function postItems(\Aimeos\Base\View\Iface $view, ServerRequestInterface $request, ResponseInterface $response): \Psr\Http\Message\ResponseInterface
+    protected function post_items(\Aimeos\Base\View\Iface $view, Server_Request_Interface $request, Response_Interface $response): \Psr\Http\Message\Response_Interface
     {
-        $body = (string) $request->getBody();
-
+        $body = (string) $request->get_body();
         if (($payload = json_decode($body)) === null || !isset($payload->data)) {
-            throw new \Aimeos\Admin\JsonAdm\Exception('Invalid JSON in body', 400);
+            throw new \Aimeos\Admin\Json_Adm\Exception('Invalid JSON in body', 400);
         }
-
         if (isset($payload->data->id) || $view->param('id') != null) {
-            throw new \Aimeos\Admin\JsonAdm\Exception('Client generated IDs are not supported', 403);
+            throw new \Aimeos\Admin\Json_Adm\Exception('Client generated IDs are not supported', 403);
         }
-
-        $manager = \Aimeos\MShop::create($this->context(), $this->getPath());
-
+        $manager = \Aimeos\M_Shop::create($this->context(), $this->get_path());
         if (is_array($payload->data)) {
-            $data = $this->saveData($manager, $payload);
-
+            $data = $this->save_data($manager, $payload);
             $view->data = $data;
             $view->total = count($data);
-            $response = $response->withHeader('Content-Type', 'application/vnd.api+json; ext="bulk"; supported-ext="bulk"');
+            $response = $response->with_header('Content-Type', 'application/vnd.api+json; ext="bulk"; supported-ext="bulk"');
         } else {
             $payload->data->id = null;
-            $data = $this->saveEntry($manager, $payload->data);
-
+            $data = $this->save_entry($manager, $payload->data);
             $view->data = $data;
             $view->total = 1;
         }
-
         return $response;
     }
 }

@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 /**
  * @license LGPLv3, http://opensource.org/licenses/LGPL-3.0
  * @copyright Aimeos (aimeos.org), 2015-2026
  * @package Admin
  * @subpackage JsonAdm
  */
-
-namespace Aimeos\Admin\JsonAdm;
+namespace Aimeos\Admin\Json_Adm;
 
 /**
  * JSON API common client
@@ -17,51 +15,45 @@ namespace Aimeos\Admin\JsonAdm;
  * @package Admin
  * @subpackage JsonAdm
  */
-abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
+abstract class Base implements \Aimeos\Admin\Json_Adm\Iface, \Aimeos\Macro\Iface
 {
     use \Aimeos\Macro\Macroable;
-
-    private \Aimeos\MShop\ContextIface $context;
+    private \Aimeos\M_Shop\Context_Iface $context;
     private ?\Aimeos\Base\View\Iface $view = null;
     private ?\Aimeos\Bootstrap $aimeos = null;
-
     /**
      * Initializes the client
      *
      * @param \Aimeos\MShop\ContextIface $context MShop context object
      * @param string $path Name of the client separated by slashes, e.g "product/property"
      */
-    public function __construct(\Aimeos\MShop\ContextIface $context, private string $path)
+    public function __construct(\Aimeos\M_Shop\Context_Iface $context, private string $path)
     {
         $this->context = $context;
     }
-
     /**
      * Returns the Aimeos bootstrap object
      *
      * @return \Aimeos\Bootstrap The Aimeos bootstrap object
      */
-    protected function getAimeos(): \Aimeos\Bootstrap
+    protected function get_aimeos(): \Aimeos\Bootstrap
     {
         if (!isset($this->aimeos)) {
-            throw new \Aimeos\Admin\JsonAdm\Exception('Aimeos object not available', 500);
+            throw new \Aimeos\Admin\Json_Adm\Exception('Aimeos object not available', 500);
         }
-
         return $this->aimeos;
     }
-
     /**
      * Sets the Aimeos bootstrap object
      *
      * @param \Aimeos\Bootstrap $aimeos The Aimeos bootstrap object
      * @return \Aimeos\Admin\JsonAdm\Iface Reference to this object for fluent calls
      */
-    public function setAimeos(\Aimeos\Bootstrap $aimeos): \Aimeos\Admin\JsonAdm\Iface
+    public function set_aimeos(\Aimeos\Bootstrap $aimeos): \Aimeos\Admin\Json_Adm\Iface
     {
         $this->aimeos = $aimeos;
         return $this;
     }
-
     /**
      * Returns the view object that will generate the admin output.
      *
@@ -70,24 +62,21 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
     protected function view(): \Aimeos\Base\View\Iface
     {
         if (!isset($this->view)) {
-            throw new \Aimeos\Admin\JsonAdm\Exception('No view available', 500);
+            throw new \Aimeos\Admin\Json_Adm\Exception('No view available', 500);
         }
-
         return $this->view;
     }
-
     /**
      * Sets the view object that will generate the admin output.
      *
      * @param \Aimeos\Base\View\Iface $view The view object which generates the admin output
      * @return \Aimeos\Admin\JsonAdm\Iface Reference to this object for fluent calls
      */
-    public function setView(\Aimeos\Base\View\Iface $view): \Aimeos\Admin\JsonAdm\Iface
+    public function set_view(\Aimeos\Base\View\Iface $view): \Aimeos\Admin\Json_Adm\Iface
     {
         $this->view = $view;
         return $this;
     }
-
     /**
      * Returns the items with parent/child relationships
      *
@@ -95,28 +84,26 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
      * @param array $include List of resource types that should be fetched
      * @return \Aimeos\Map List of items implementing \Aimeos\MShop\Common\Item\Iface
      */
-    protected function getChildItems(\Aimeos\Map $items, array $include): \Aimeos\Map
+    protected function get_child_items(\Aimeos\Map $items, array $include): \Aimeos\Map
     {
         return map();
     }
-
     /**
      * Returns the context item object
      *
      * @return \Aimeos\MShop\ContextIface Context object
      */
-    protected function context(): \Aimeos\MShop\ContextIface
+    protected function context(): \Aimeos\M_Shop\Context_Iface
     {
         return $this->context;
     }
-
     /**
      * Returns the list of domains that are available as resources
      *
      * @param \Aimeos\Base\View\Iface $view View object with "resource" parameter
      * @return array List of domain names
      */
-    protected function getDomains(\Aimeos\Base\View\Iface $view): array
+    protected function get_domains(\Aimeos\Base\View\Iface $view): array
     {
         if (($domains = $view->param('resource')) == '') {
             /** admin/jsonadm/domains
@@ -138,10 +125,8 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
              */
             $domains = $this->context()->config()->get('admin/jsonadm/domains', []);
         }
-
         return (array) $domains;
     }
-
     /**
      * Returns the list items for association relationships
      *
@@ -149,40 +134,35 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
      * @param array $include List of resource types that should be fetched
      * @return \Aimeos\Map List of items implementing \Aimeos\MShop\Common\Item\Lists\Iface
      */
-    protected function getListItems(\Aimeos\Map $items, array $include): \Aimeos\Map
+    protected function get_list_items(\Aimeos\Map $items, array $include): \Aimeos\Map
     {
-        return $items->filter(fn ($item) => $item instanceof \Aimeos\MShop\Common\Item\Lists\Iface);
+        return $items->filter(fn($item) => $item instanceof \Aimeos\M_Shop\Common\Item\Lists\Iface);
     }
-
     /**
      * Returns the path to the client
      *
      * @return string Client path, e.g. "product/property"
      */
-    protected function getPath(): string
+    protected function get_path(): string
     {
         return $this->path;
     }
-
     /**
      * Returns the items associated via a lists table
      *
      * @param \Aimeos\Map $listItems List of items implementing \Aimeos\MShop\Common\Item\Lists\Iface
      * @return \Aimeos\Map List of items implementing \Aimeos\MShop\Common\Item\Iface
      */
-    protected function getRefItems(\Aimeos\Map $listItems): \Aimeos\Map
+    protected function get_ref_items(\Aimeos\Map $list_items): \Aimeos\Map
     {
         $list = [];
-
-        foreach ($listItems as $listItem) {
-            if ($refItem = $listItem->getRefItem()) {
-                $list[$refItem->getResourceType() . '-' . $refItem->getId()] = $refItem;
+        foreach ($list_items as $list_item) {
+            if ($ref_item = $list_item->get_ref_item()) {
+                $list[$ref_item->get_resource_type() . '-' . $ref_item->get_id()] = $ref_item;
             }
         }
-
         return map($list);
     }
-
     /**
      * Returns the list of allowed resources
      *
@@ -190,27 +170,24 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
      * @param array $resources List of all available resources
      * @return array List of allowed resources
      */
-    protected function getAllowedResources(\Aimeos\Base\View\Iface $view, array $resources): array
+    protected function get_allowed_resources(\Aimeos\Base\View\Iface $view, array $resources): array
     {
         $config = $this->context()->config();
         $allowed = [];
-
         foreach ($resources as $resource) {
             if ($view->access($config->get('admin/jsonadm/resource/' . $resource . '/groups', [])) === true) {
                 $allowed[] = $resource;
             }
         }
-
         return $allowed;
     }
-
     /**
      * Returns the list of additional resources
      *
      * @param \Aimeos\Base\View\Iface $view View object with "resource" parameter
      * @return array List of domain names
      */
-    protected function getResources(\Aimeos\Base\View\Iface $view): array
+    protected function get_resources(\Aimeos\Base\View\Iface $view): array
     {
         /** admin/jsonadm/resources
          * A list of additional resources name whose clients are available for the JSON API
@@ -230,7 +207,6 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
          */
         return (array) $view->config('admin/jsonadm/resources', []);
     }
-
     /**
      * Initializes the criteria object based on the given parameter
      *
@@ -238,13 +214,10 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
      * @param array $params List of criteria data with condition, sorting and paging
      * @return \Aimeos\Base\Criteria\Iface Initialized criteria object
      */
-    protected function initCriteria(\Aimeos\Base\Criteria\Iface $criteria, array $params): \Aimeos\Base\Criteria\Iface
+    protected function init_criteria(\Aimeos\Base\Criteria\Iface $criteria, array $params): \Aimeos\Base\Criteria\Iface
     {
-        return $criteria->order($params['sort'] ?? [])
-            ->add($criteria->parse($params['filter'] ?? []))
-            ->slice($params['page']['offset'] ?? 0, $params['page']['limit'] ?? 25);
+        return $criteria->order($params['sort'] ?? [])->add($criteria->parse($params['filter'] ?? []))->slice($params['page']['offset'] ?? 0, $params['page']['limit'] ?? 25);
     }
-
     /**
      * Creates of updates several items at once
      *
@@ -252,19 +225,16 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
      * @param \stdClass $request Object with request body data
      * @return \Aimeos\Map List of items
      */
-    protected function saveData(\Aimeos\MShop\Common\Manager\Iface $manager, \stdClass $request): \Aimeos\Map
+    protected function save_data(\Aimeos\M_Shop\Common\Manager\Iface $manager, \stdClass $request): \Aimeos\Map
     {
         $data = [];
-
         if (isset($request->data)) {
             foreach ((array) $request->data as $entry) {
-                $data[] = $this->saveEntry($manager, $entry);
+                $data[] = $this->save_entry($manager, $entry);
             }
         }
-
         return map($data);
     }
-
     /**
      * Saves and returns the new or updated item
      *
@@ -272,32 +242,26 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
      * @param \stdClass $entry Object including "id" and "attributes" elements
      * @return \Aimeos\MShop\Common\Item\Iface New or updated item
      */
-    protected function saveEntry(\Aimeos\MShop\Common\Manager\Iface $manager, \stdClass $entry): \Aimeos\MShop\Common\Item\Iface
+    protected function save_entry(\Aimeos\M_Shop\Common\Manager\Iface $manager, \stdClass $entry): \Aimeos\M_Shop\Common\Item\Iface
     {
         if (isset($entry->id)) {
             $item = $manager->get($entry->id);
         } else {
             $item = $manager->create();
         }
-
-        if (isset($entry->attributes) && ($attr = (array) $entry->attributes)) {
-            if ($item instanceof \Aimeos\MShop\Common\Item\Config\Iface) {
+        if (isset($entry->attributes) && $attr = (array) $entry->attributes) {
+            if ($item instanceof \Aimeos\M_Shop\Common\Item\Config\Iface) {
                 $key = str_replace('/', '.', $this->path) . '.config';
                 $attr[$key] = (array) ($attr[$key] ?? []);
             }
-
-            $item = $item->fromArray($attr, true);
+            $item = $item->from_array($attr, true);
         }
-
         $item = $manager->save($item);
-
         if (isset($entry->relationships)) {
-            $this->saveRelationships($manager, $item, $entry->relationships);
+            $this->save_relationships($manager, $item, $entry->relationships);
         }
-
-        return $manager->get($item->getId());
+        return $manager->get($item->get_id());
     }
-
     /**
      * Saves the item references associated via the list
      *
@@ -305,31 +269,24 @@ abstract class Base implements \Aimeos\Admin\JsonAdm\Iface, \Aimeos\Macro\Iface
      * @param \Aimeos\MShop\Common\Item\Iface $item Domain item with an unique ID set
      * @param \stdClass $relationships Object including the <domain>/data/attributes structure
      */
-    protected function saveRelationships(
-        \Aimeos\MShop\Common\Manager\Iface $manager,
-        \Aimeos\MShop\Common\Item\Iface $item,
-        \stdClass $relationships
-    ) {
-        $id = $item->getId();
-        $listManager = $manager->getSubManager('lists');
-
+    protected function save_relationships(\Aimeos\M_Shop\Common\Manager\Iface $manager, \Aimeos\M_Shop\Common\Item\Iface $item, \stdClass $relationships)
+    {
+        $id = $item->get_id();
+        $list_manager = $manager->get_sub_manager('lists');
         foreach ((array) $relationships as $domain => $list) {
             if (isset($list->data)) {
                 foreach ((array) $list->data as $data) {
-                    $listItem = $listManager->create()->setType('default');
-
-                    if (isset($data->attributes) && ($attr = (array) $data->attributes)) {
+                    $list_item = $list_manager->create()->set_type('default');
+                    if (isset($data->attributes) && $attr = (array) $data->attributes) {
                         $key = str_replace('/', '.', $this->path) . '.config';
                         $attr[$key] = (array) ($attr[$key] ?? []);
-                        $listItem = $listItem->fromArray($attr, true);
+                        $list_item = $list_item->from_array($attr, true);
                     }
-
                     if (isset($data->id)) {
-                        $listItem->setRefId($data->id);
+                        $list_item->set_ref_id($data->id);
                     }
-
-                    $listItem->setParentId($id)->setDomain($domain);
-                    $listManager->save($listItem, false);
+                    $list_item->set_parent_id($id)->set_domain($domain);
+                    $list_manager->save($list_item, false);
                 }
             }
         }
